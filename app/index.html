@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script src="js/game.js"></script>
+        <script src="js/mat.js"></script>
+        <style>
+            * {margin: 0; padding: 0;}
+            body {overflow: hidden;}
+            canvas{background: black;}
+        </style>
+        <script>
+            window.addEventListener("load", () => {
+                window.game = new Game()
+                loop()
+            })
+        </script>
+
+        <script type="vertex_shader" id="vs_01">
+            attribute vec2 a_position;
+            attribute vec2 a_textCoord;
+
+            varying vec2 v_textCoord;
+            void main() {
+                gl_Position = vec4(a_position, 1, 1);
+                v_textCoord = a_textCoord;
+            }
+        </script>
+
+        <script type="fragment_shader" id="fs_01">
+            precision mediump float;
+
+            uniform sampler2D u_image;
+
+            varying vec2 v_textCoord;
+            void main() {
+                gl_FragColor = texture2D(u_image, v_textCoord);
+            }
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>
