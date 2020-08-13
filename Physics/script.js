@@ -33,8 +33,7 @@ class Player {
     fixDef.shape = new box2d.b2CircleShape(15 / SCALE);
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
-    this.body = bodyDef;
-    this.speed = 30/SCALE;
+    this.speed = 300/SCALE;
     this.velX = 0;
     this.velY = 0;
   }
@@ -80,44 +79,50 @@ function tick() {
   world.Step(1/60, 10, 10);
   world.ClearForces();
 
-  let xInput = input.right - input.left;
-  let yInput = input.up - input.down;
+  let xInput = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  let yInput = (input.down ? 1 : 0) - (input.up ? 1 : 0);
   let playerVel = new box2d.b2Vec2(xInput * player.speed, yInput * player.speed);
   if (xInput != 0 && yInput != 0) {
     playerVel.Multiply(0.707);
   }
-  //player.body.SetLinearVelocity(playerVel);
+  player.body.SetLinearVelocity(playerVel);
 }
 
-function keyDown(key) {
-  console.log(key);
-  switch(key) {
+function keyDown(event) {
+  switch(event.key) {
     case 'a':
       input.left = true;
+      break;
     case 'd':
       input.right = true;
-    case 's':
-      input.down = true;
+      break;
     case 'w':
       input.up = true;
+      break;
+    case 's':
+      input.down = true;
+      break;
   }
 }
 
-function keyUp(key) {
-  switch(key) {
+function keyUp(event) {
+  switch(event.key) {
     case 'a':
       input.left = false;
+      break;
     case 'd':
       input.right = false;
-    case 's':
-      input.down = false;
+      break;
     case 'w':
       input.up = false;
+      break;
+    case 's':
+      input.down = false;
+      break;
   }
 }
 
 document.onkeydown = keyDown;
 document.onkeyup = keyUp;
-console.log(document.onkeydown);
 
 init();
