@@ -40,7 +40,9 @@ function init() {
   //circle.y = 100;
   //stage.addChild(circle);
   //stage.update();
+  stage.onMouseDown = () => {
 
+  }
   setupPhysics();
   stage.update();
   createjs.Ticker.on("tick", tick);
@@ -51,12 +53,12 @@ function init() {
 }
 
 function setupPhysics() {
-  world = new box2d.b2World(new box2d.b2Vec2(0, 50), true);
+  world = new box2d.b2World(new box2d.b2Vec2(0, 0), true);
   var fixDef = new box2d.b2FixtureDef();
   fixDef.density = 1;
   fixDef.friciton = 0.5;
   var bodyDef = new box2d.b2BodyDef();
-  bodyDef.type = box2d.b2Body.b2_staticBody;
+  bodyDef.type = box2d.b2Body.b2_dynamicBody;
   bodyDef.position.x = 400 / SCALE;
   bodyDef.position.y = 600 / SCALE;
   fixDef.shape = new box2d.b2PolygonShape();
