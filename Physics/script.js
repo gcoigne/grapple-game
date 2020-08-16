@@ -17,7 +17,7 @@ var input = {
     down: false,
     up: false,
     m1: false,
-    m2: false,
+    m2: false
 };
 
 class Player {
@@ -30,13 +30,12 @@ class Player {
         fixDef.density = 1;
         fixDef.friciton = 0.5;
         fixDef.restitution = 0.5;
+        fixDef.linearDamping = 0.5; //Doesn't seem to do anything.
         fixDef.shape = new box2d.b2CircleShape(15 / SCALE);
         this.body = world.CreateBody(bodyDef);
         this.fix = this.body.CreateFixture(fixDef);
-        this.body = bodyDef;
-        this.speed = 30 / SCALE;
-        this.velX = 0;
-        this.velY = 0;
+        this.moveImpulse = 30 / SCALE;
+        this.maxSpeed = 300 / SCALE;
     }
 }
 
@@ -52,8 +51,8 @@ function init() {
     testObj = new createjs.Shape();
 
     testObj.graphics.beginFill("#FF0099").drawRect(0, 0, 100, 100)
-    testObj.x = stage.canvas.width/2 - 50
-    testObj.y = stage.canvas.height/2 - 50
+    testObj.x = stage.canvas.width / 2 - 50
+    testObj.y = stage.canvas.height / 2 - 50
     testObj.regX = 50
     testObj.regY = 50
     stage.addChild(testObj);
@@ -65,7 +64,7 @@ function init() {
 }
 
 function setupPhysics() {
-    world = new box2d.b2World(new box2d.b2Vec2(0, 0), true);
+    world = new box2d.b2World(new box2d.b2Vec2(0, 0), false);
     var fixDef = new box2d.b2FixtureDef();
     fixDef.density = 1;
     fixDef.friciton = 0.5;
@@ -87,13 +86,17 @@ function setupPhysics() {
 function tick() {
     testObj.rotation++
     world.DrawDebugData();
-    world.Step(1 / 60, 10, 10);
+    world.Step(1/60, 10, 10);
     world.ClearForces();
-    let xInput = input.right - input.left;
-    let yInput = input.up - input.down;
-    let playerVel = new box2d.b2Vec2(xInput * player.speed, yInput * player.speed);
+    let xInput = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    let yInput = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+    let playerImp = new box2d.b2Vec2(xInput * player.moveImpulse, yInput * player.moveImpulse);
     if (xInput != 0 && yInput != 0) {
-        playerVel.Multiply(0.707);
+        playerImp.Multiply(0.707);
+    }
+    player.body.ApplyImpulse(playerImp, player.body.GetWorldCenter());
+    if (player.body.m_linearVelocity.Length() > player.maxSpeed) {
+        player.SetLinearVelocity(player.body.m_linearVelocity.Multiply(player.maxSpeed / player.body.m_linearVelocity.Length()));
     }
     stage.update();
 }
@@ -127,6 +130,5 @@ function keyUp(key) {
 
 document.onkeydown = keyDown;
 document.onkeyup = keyUp;
-console.log(document.onkeydown);
 
 init();
