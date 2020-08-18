@@ -1,0 +1,12 @@
+Graphics:
+    Door:
+
+    Key:
+
+    Lever:
+
+    hazards:
+        
+    Walls:
+        One that is smooth
+        One that is rough
