@@ -41,21 +41,20 @@ class Player {
 
 
 var SCALE = 30;
-var stage, world, player, testObj;
+var stage, world, player;//, testObj;
 
 function init() {
     stage = new createjs.Stage(document.getElementById("game-canvas"));
     setupPhysics();
     player = new Player(100 / SCALE, 50 / SCALE);
 
-    testObj = new createjs.Shape();
-
-    testObj.graphics.beginFill("#FF0099").drawRect(0, 0, 100, 100)
-    testObj.x = stage.canvas.width / 2 - 50
-    testObj.y = stage.canvas.height / 2 - 50
-    testObj.regX = 50
-    testObj.regY = 50
-    stage.addChild(testObj);
+    //testObj = new createjs.Shape();
+    //testObj.graphics.beginFill("#FF0099").drawRect(0, 0, 100, 100)
+    //testObj.x = stage.canvas.width / 2 - 50
+    //testObj.y = stage.canvas.height / 2 - 50
+    //testObj.regX = 50
+    //testObj.regY = 50
+    //stage.addChild(testObj);
 
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.framerate = 60;
@@ -84,7 +83,8 @@ function setupPhysics() {
 }
 
 function tick() {
-    testObj.rotation++
+    stage.update();
+    //testObj.rotation++;
     world.DrawDebugData();
     world.Step(1/60, 10, 10);
     world.ClearForces();
@@ -98,37 +98,68 @@ function tick() {
     if (player.body.m_linearVelocity.Length() > player.maxSpeed) {
         player.SetLinearVelocity(player.body.m_linearVelocity.Multiply(player.maxSpeed / player.body.m_linearVelocity.Length()));
     }
-    stage.update();
 }
 
-function keyDown(key) {
-    console.log(key);
-    switch (key) {
+function keyDown(e) {
+    switch (e.key) {
         case 'a':
             input.left = true;
+            break;
         case 'd':
             input.right = true;
+            break;
         case 's':
             input.down = true;
+            break;
         case 'w':
             input.up = true;
+            break;
     }
 }
 
-function keyUp(key) {
-    switch (key) {
+function keyUp(e) {
+    switch (e.key) {
         case 'a':
             input.left = false;
+            break;
         case 'd':
             input.right = false;
+            break;
         case 's':
             input.down = false;
+            break;
         case 'w':
             input.up = false;
+            break;
     }
+}
+
+function mouseDown(e) {
+  switch(e.button) {
+    case 0:
+      input.m1 = true;
+      break;
+    case 1:
+      input.m2 = true;
+      break;
+  }
+}
+
+function mouseUp(e) {
+  switch(e.button) {
+    case 0:
+      input.m1 = false;
+      break;
+    case 1:
+      input.m2 = false;
+      break;
+  }
 }
 
 document.onkeydown = keyDown;
 document.onkeyup = keyUp;
+document.onmousedown = mouseDown;
+document.onmouseup = mouseUp;
+document.oncontextmenu = function(e) { e.preventDefault() };
 
 init();
