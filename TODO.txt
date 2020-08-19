@@ -1,8 +1,4 @@
 Graphics:
-    Door:
-
-    Key:
-
     Lever:
 
     hazards:
