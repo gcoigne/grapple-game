@@ -1,8 +1,10 @@
 Graphics:
-    Lever:
-
+    interactables:
+        pressure plate
+        wall button
     hazards:
-        
+        spikes
+        enemy
     Walls:
         One that is smooth
         One that is rough
