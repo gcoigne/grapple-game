@@ -1,7 +1,4 @@
 Graphics:
-    interactables:
-        pressure plate
-        wall button
     hazards:
         spikes
         enemy
