@@ -1,0 +1,6 @@
+Graphics:
+    hazards:
+        enemy
+    Walls:
+        One that is smooth
+        One that is rough
