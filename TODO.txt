@@ -1,6 +1,5 @@
 Graphics:
     hazards:
-        spikes
         enemy
     Walls:
         One that is smooth
