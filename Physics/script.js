@@ -1,3 +1,5 @@
+import * as overlay from "./tickLogic.js"
+
 let box2d = {
   b2Vec2: Box2D.Common.Math.b2Vec2,
   b2BodyDef: Box2D.Dynamics.b2BodyDef,
@@ -65,7 +67,6 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       }
     }
 }
-MyContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
 MyContactListener.prototype.constructor = MyContactListener;
 
 class Wall {
@@ -152,6 +153,7 @@ function init() {
     setupPhysics();
     setupInput();
     player = new Player(100 / SCALE, 50 / SCALE);
+    overlay.init(stage);
 
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.framerate = 60;
@@ -175,7 +177,7 @@ function setupPhysics() {
 }
 
 function tick() {
-  stage.update();
+  overlay.tick()
   world.DrawDebugData();
   world.Step(1/60, 10, 10);
   world.ClearForces();
