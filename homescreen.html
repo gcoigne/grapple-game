@@ -1,20 +1,25 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
-    <script>      
-      function init() {
-        var stage = new createjs.Stage("demoCanvas");
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-        circle.x = 100;
-        circle.y = 100;
-        stage.addChild(circle);
-        stage.update();
-      }
-    </script>
-  </head>
-  <body onload="init();">
-    <canvas id="demoCanvas" width="500" height="200"></canvas>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="homescreen.css">
+    
+</head>
+<body>
+<h1>Title of the Game</h1>
+<div class="button-container-div">
+    <div class="center">
+    <a href="account_screen.html">
+    <button id="log-in" class="button" >LOG IN</button>
+    </a>
+    <a href="account_screen.html">
+    <button id="sign-up" class="button">SIGN UP</button>
+    </a>
+    <a href="account_screen.html">
+        <button id="play" class="button">PLAY</button>
+    </a>
+    </div>
+</div>   
+</body>
 </html>
