@@ -40,33 +40,52 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       let bodyB = fixB.GetBody();
       let bodyDataB = bodyB.GetUserData();
 
+      if (bodyDataA instanceof Wall) {
+        if (bodyDataB instanceof Player) {
+          if (bodyDataB.isGrappling) {
+            //bodyDataB.endGrapple();
+          }
+        }
+        else if (bodyDataB instanceof Grapple) {
+          if (bodyDataA.isSoft) {
+            bodyDataB.isStuck = true;
+          }
+          else {
+            bodyDataB.isDone = true;
+          }
+          //bodyB.SetActive(false);
+        }
+      }
+
+      else if (bodyDataA instanceof Hazard) {
+        if (bodyDataB instanceof Player) {
+          player.isDead = true;
+        }
+      }
+
+      else if (bodyDataA instanceof Player) {
+        if (bodyDataB instanceof Wall) {
+          if (bodyDataA.isGrappling) {
+            //bodyDataA.endGrapple();
+          }
+        }
+      }
+
       if (bodyDataA instanceof Grapple) {
         if (bodyDataB instanceof Wall) {
           if (bodyDataB.isSoft) {
             bodyDataA.isStuck = true;
           }
           else {
-            bodyA.SetPositionAndAngle(player.body.GetWorldCenter, 0);
+            bodyDataA.isDone = true;
           }
           bodyA.setActive(false);
         }
       }
-
-      else if (bodyDataB instanceof Grapple) {
-        if (bodyDataA instanceof Wall) {
-          if (bodyDataA.isSoft) {
-            bodyDataB.isStuck = true;
-          }
-          else {
-            bodyB.SetPositionAndAngle(player.body.GetWorldCenter, 0);
-          }
-          bodyB.SetActive(false);
-        }
-      }
     }
 }
-MyContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
-MyContactListener.prototype.constructor = MyContactListener;
+//MyContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
+//MyContactListener.prototype.constructor = MyContactListener;
 
 class Wall {
   constructor(x, y, w, h, s) {
@@ -86,17 +105,34 @@ class Wall {
   }
 }
 
+class Hazard {
+  constructor(x, y, w, h) {
+    let bodyDef = new box2d.b2BodyDef();
+    bodyDef.type = box2d.b2Body.b2_staticBody;
+    bodyDef.position.x = x;
+    bodyDef.position.y = y;
+    let fixDef = new box2d.b2FixtureDef();
+    fixDef.friction = 0.5;
+    fixDef.restitution = 0.5;
+    fixDef.shape = new box2d.b2PolygonShape();
+    fixDef.shape.SetAsBox(w / SCALE, h / SCALE);
+    this.body = world.CreateBody(bodyDef);
+    this.fix = this.body.CreateFixture(fixDef);
+    this.body.SetUserData(this);
+  }
+}
+
 class Player {
   constructor(x, y) {
     let bodyDef = new box2d.b2BodyDef();
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
+    bodyDef.linearDamping = 2;
     let fixDef = new box2d.b2FixtureDef();
     fixDef.density = 1;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.5;
-    fixDef.linearDamping = 0.5; //Doesn't seem to do anything.
     fixDef.shape = new box2d.b2CircleShape(20 / SCALE);
     fixDef.filter.categoryBits = types.PLAYER;
     this.body = world.CreateBody(bodyDef);
@@ -104,8 +140,10 @@ class Player {
     this.body.SetUserData(this);
     this.moveImpulse = 30 / SCALE;
     this.maxSpeed = 300 / SCALE;
-    this.grapple = null;
     this.isGrappling = false;
+    this.isDead = false;
+    this.grapple = null;
+    this.inventory = {};
   }
     
   useGrapple() {
@@ -118,8 +156,7 @@ class Player {
   }
 
   endGrapple() {
-    world.DestroyBody(this.grapple.body);
-    this.grapple = null;
+    this.grapple.isDone = true;
     this.isGrappling = false;
   }
 }
@@ -140,6 +177,7 @@ class Grapple {
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
     this.body.SetLinearVelocity(v)
+    this.isDone = false;
   }
 }
 
@@ -151,6 +189,9 @@ function init() {
     stage = new createjs.Stage(document.getElementById("game-canvas"));
     setupPhysics();
     setupInput();
+    
+    new Wall(0, 0, 10000 / SCALE, 200 / SCALE, true);
+    new Hazard(50 / SCALE, 50 / SCALE, 200 / SCALE, 200 / SCALE);
     player = new Player(100 / SCALE, 50 / SCALE);
 
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -170,8 +211,6 @@ function setupPhysics() {
     debugDraw.SetDrawScale(SCALE);
     debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
     world.SetDebugDraw(debugDraw);
-    
-    new Wall(0, 0, 400, 20, true);
 }
 
 function tick() {
@@ -179,18 +218,30 @@ function tick() {
   world.DrawDebugData();
   world.Step(1/60, 10, 10);
   world.ClearForces();
+  if (player.isDead) {
+
+  }
+  else {
+    
   let xInput = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   let yInput = (input.down ? 1 : 0) - (input.up ? 1 : 0);
   let playerImp;
 
+  playerImp = new box2d.b2Vec2(xInput * player.moveImpulse, yInput * player.moveImpulse);
+  if (xInput != 0 && yInput != 0) {
+    playerImp.Multiply(0.707);
+  }
+  player.body.ApplyImpulse(playerImp, player.body.GetWorldCenter());
+
   if (input.m1) {
     if (player.isGrappling) {
       if (player.grapple.isStuck) {
+        player.grapple.body.SetActive(false);
         let playerCenter = player.body.GetWorldCenter();
         let grappleCenter = player.grapple.body.GetWorldCenter();
         let grappleAngle = Math.atan2(grappleCenter.y - playerCenter.y, grappleCenter.x - playerCenter.x);
-        playerImp = new box2d.b2Vec2(player.moveImpulse * 2 * Math.cos(grappleAngle), player.moveImpulse * 2 * Math.sin(grappleAngle));
-        player.body.ApplyImpulse(playerImp, player.body.GetWorldCenter());
+        let grappleImp = new box2d.b2Vec2(player.moveImpulse * 2 * Math.cos(grappleAngle), player.moveImpulse * 2 * Math.sin(grappleAngle));
+        player.body.ApplyImpulse(grappleImp, player.body.GetWorldCenter());
       }
     }
     else {
@@ -201,17 +252,26 @@ function tick() {
     if (player.isGrappling) {
       player.endGrapple();
     }
-      else {
-        playerImp = new box2d.b2Vec2(xInput * player.moveImpulse, yInput * player.moveImpulse);
-        if (xInput != 0 && yInput != 0) {
-          playerImp.Multiply(0.707);
-        }
-        player.body.ApplyImpulse(playerImp, player.body.GetWorldCenter());
-        if (player.body.m_linearVelocity.Length() > player.maxSpeed) {
-          player.body.SetLinearVelocity(player.body.m_linearVelocity.Multiply(player.maxSpeed / player.body.m_linearVelocity.Length()));
-        }
+    else {
+      if (player.body.m_linearVelocity.Length() > player.maxSpeed) {
+        player.body.m_linearVelocity.Multiply(player.maxSpeed / player.body.m_linearVelocity.Length());
       }
     }
+  }
+  }
+
+  if (player && player.isDead) {
+    if (player.grapple) {
+      world.DestroyBody(player.grapple.body);
+      player.grapple = null;
+    }
+    player.body.SetActive(false);
+  }
+
+  if (player.grapple && player.grapple.isDone) {
+    world.DestroyBody(player.grapple.body);
+    player.grapple = null;
+  }
 }
 
 function setupInput() {
@@ -249,7 +309,7 @@ function setupInput() {
     }
   }
 
-  document.oncontextmenu = function(evt) { evt.preventDefault(); };
+  //document.oncontextmenu = function(evt) { evt.preventDefault(); };
 
   stage.on("stagemousedown", function(evt) { input.m1 = true; } );
 
