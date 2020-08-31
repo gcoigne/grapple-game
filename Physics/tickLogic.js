@@ -1,5 +1,5 @@
 
-let stage, loader,   player
+let stage, loader, player
 let canvas_height, canvas_width
 let map = [...Array(100)].map(() => [...Array(100)])
 let mapSize = map.length
@@ -8,7 +8,8 @@ let locy = 50       //refering to the map
 let lastlocx = 0    //in pixels
 let lastlocy = 0    //in pixels
 let chunkSize = 5   // needs to be a prime number
-let scale = 2
+let tile
+let scale = 3
 let offsetx, offsety
 let mapContainerfront = new createjs.Container()
 let mapContainerback = new createjs.Container()
@@ -20,6 +21,12 @@ let eleCounter = 0
 let tickCounter = 0
 
 export function init(mainLoopStage) {
+    let canvas = document.getElementById("game-canvas")
+    canvas.getContext('2d').imageSmoothingEnabled = false
+    canvas_height = canvas.height
+    canvas_width = canvas.width
+    offsetx = canvas_width / 2 - 16 * scale
+    offsety = canvas_height / 2 - 16 * scale
     stage = mainLoopStage
     let manifest = [
         { src: "floor_tile.png", id: "0" },
@@ -65,11 +72,11 @@ function handleComplete() {
     mapContainerorigin.scale = scale
     //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
     stage.addChild(mapContainerback, player, mapContainerfront)
-    createjs.Ticker.timingMode = createjs.Ticker.RAF
-    createjs.Ticker.framerate = 60
-    createjs.Ticker.on("tick", tick)
 }
 
-export function tick() {
-    stage.update();
+export function tick(body) {
+    stage.update()
+    let vec = body.GetPosition()
+    player.x = vec.x * 30
+    player.y = vec.y * 30
 }

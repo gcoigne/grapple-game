@@ -96,10 +96,7 @@ function handleComplete() {
     stage.addChild(mapContainerback, player, mapContainerfront)
     createjs.Ticker.timingMode = createjs.Ticker.RAF
     createjs.Ticker.framerate = 60
-<<<<<<< HEAD
-=======
     createjs.Ticker.on("tick", tick)
->>>>>>> Auto-Generator
 }
 
 function generateSubChunk(xSubChunkPos, ySubChunkPos, x, y) {

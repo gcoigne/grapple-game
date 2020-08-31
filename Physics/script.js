@@ -177,9 +177,8 @@ function setupPhysics() {
 }
 
 function tick() {
-  overlay.tick()
-  world.DrawDebugData();
   world.Step(1/60, 10, 10);
+  world.DrawDebugData()
   world.ClearForces();
   let xInput = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   let yInput = (input.down ? 1 : 0) - (input.up ? 1 : 0);
@@ -214,6 +213,7 @@ function tick() {
         }
       }
     }
+    //overlay.tick(player.body)
 }
 
 function setupInput() {

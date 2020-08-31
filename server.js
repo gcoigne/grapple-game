@@ -5,6 +5,7 @@ const port = 3000;
 const hostname = "localhost";
 
 app.use(express.static("Physics"));
+app.use("/Sprites", express.static("Sprites"));
 app.use(express.json());
 
 app.get("/", function (req, res) {
