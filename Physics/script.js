@@ -60,7 +60,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     else if (bodyDataA instanceof Door) {
       if (bodyDataB instanceof Player) {
-        if (!bodyDataA.isOpen && key in player.inventory && player.inventory["key"] > 0) {
+        if (!bodyDataA.isOpen && "key" in player.inventory && player.inventory["key"] > 0) {
           bodyDataB.inventory["key"]--;
           bodyDataA.isOpen = true;
         }
@@ -80,15 +80,16 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         }
       }
       else if (bodyDataB instanceof Door) {
-        if (!bodyDataB.isOpen && key in player.inventory && player.inventory["key"] > 0) {
+        if (!bodyDataB.isOpen && "key" in player.inventory && player.inventory["key"] > 0) {
           bodyDataA.inventory["key"]--;
           bodyDataB.isOpen = true;
         }
       }
       else if (bodyDataB instanceof Collectable) {
         if (!bodyDataB.isCollected) {
+          console.log("a");
           bodyDataB.isCollected = true;
-          type = bodyDataB.type;
+          let type = bodyDataB.collectableType;
           if (type in player.inventory) {
             player.inventory[type]++;
           }
@@ -99,7 +100,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       }
     }
 
-    if (bodyDataA instanceof Grapple) {
+    else if (bodyDataA instanceof Grapple) {
       if (bodyDataB instanceof Wall) {
         if (bodyDataB.isSoft) {
           bodyDataA.isStuck = true;
@@ -107,21 +108,21 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         else {
           bodyDataA.isDone = true;
         }
-        //bodyA.setActive(false);
+        //bodyA.SetActive(false);
       }
     }
-  }
     
-  else if (bodyDataA instanceof Collectable) {
-    if (bodyDataB instanceof Player) {
-      if (!bodyDataA.isCollected) {
-        bodyDataB.isCollected = true;
-        type = bodyDataA.type;
-        if (type in player.inventory) {
-          player.inventory[type]++;
-        }
-        else {
+    else if (bodyDataA instanceof Collectable) {
+      if (bodyDataB instanceof Player) {
+        if (!bodyDataA.isCollected) {
+          bodyDataB.isCollected = true;
+          type = bodyDataA.collectableType;
+          if (type in player.inventory) {
+            player.inventory[type]++;
+          }
+          else {
            player.inventory[type] = 1;
+          }
         }
       }
     }
@@ -167,7 +168,7 @@ class Door {
 
   tick() {
     if (this.isOpen) {
-      body.setActive(false);
+      this.body.SetActive(false);
     }
   }
 }
@@ -302,23 +303,24 @@ class Grapple {
 
 class Collectable {
   constructor(x,y,r,t) {let bodyDef = new box2d.b2BodyDef();
-    bodyDef.type = box2d.b2Body.b2_dynamicBody;
+    bodyDef.type = box2d.b2Body.b2_staticBody;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
     let fixDef = new box2d.b2FixtureDef();
     fixDef.shape = new box2d.b2CircleShape(r / SCALE);
     fixDef.filter.categoryBits = categorys.INTERACT;
     fixDef.filter.maskBits = categorys.PLAYER;
+    fixDef.isSensor = true;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
-    this.type = t;
+    this.collectableType = t;
     this.isCollected = false;
   }
 
   tick() {
     if (this.isCollected) {
-      this.body.setActive(false);
+      this.body.SetActive(false);
     }
   }
 }
@@ -337,7 +339,7 @@ function init() {
     player = new Player(100 / SCALE, 50 / SCALE);
     overlay.init(stage);
     doors = [new Door(200 / SCALE, 50 / SCALE, 400 / SCALE, 400 / SCALE)];
-    collectables = [new Collectable(100 / SCALE, 200 / SCALE, 50 / SCALE, "key")];
+    collectables = [new Collectable(100 / SCALE, 100 / SCALE, 200 / SCALE, "key")];
 
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.framerate = 60;
@@ -367,11 +369,11 @@ function tick() {
     player.tick();
   }
 
-  for (door of doors) {
+  for (let door of doors) {
     door.tick();
   }
 
-  for (collectable of collectables) {
+  for (let collectable of collectables) {
     collectable.tick();
   }
 }
@@ -424,3 +426,10 @@ function setupInput() {
 }
 
 init();
+overlayTick(player.body);
+
+function overlayTick(body) {
+    //stage.update();
+    let vec = body.GetWorldCenter();
+    console.log(vec);
+}
