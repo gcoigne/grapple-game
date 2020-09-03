@@ -1,3 +1,4 @@
+import {startTick} from "./script.js"
 
 let stage, loader, player
 let canvas_height, canvas_width
@@ -72,11 +73,12 @@ function handleComplete() {
     mapContainerorigin.scale = scale
     //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
     stage.addChild(mapContainerback, player, mapContainerfront)
+    startTick()
 }
 
 export function tick(body) {
     stage.update()
     let vec = body.GetPosition()
-    player.x = vec.x * 30
-    player.y = vec.y * 30
+    player.x = vec.x * 30 - canvas_width / 2
+    player.y = vec.y * 30 - canvas_height / 2
 }

@@ -111,7 +111,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         //bodyA.SetActive(false);
       }
     }
-    
+
     else if (bodyDataA instanceof Collectable) {
       if (bodyDataB instanceof Player) {
         if (!bodyDataA.isCollected) {
@@ -121,7 +121,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
             player.inventory[type]++;
           }
           else {
-           player.inventory[type] = 1;
+            player.inventory[type] = 1;
           }
         }
       }
@@ -213,7 +213,7 @@ class Player {
     this.grapple = null;
     this.inventory = {};
   }
-    
+
   useGrapple() {
     let center = this.body.GetWorldCenter();
     let grappleAngle = Math.atan2(input.my - center.y, input.mx - center.x);
@@ -302,7 +302,8 @@ class Grapple {
 }
 
 class Collectable {
-  constructor(x,y,r,t) {let bodyDef = new box2d.b2BodyDef();
+  constructor(x, y, r, t) {
+    let bodyDef = new box2d.b2BodyDef();
     bodyDef.type = box2d.b2Body.b2_staticBody;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
@@ -330,38 +331,40 @@ let SCALE = 30;
 let stage, world, contactListener, player, doors, collectables;
 
 function init() {
-    stage = new createjs.Stage(document.getElementById("game-canvas"));
-    setupPhysics();
-    setupInput();
-    
-    new Wall(0, 0, 10000 / SCALE, 200 / SCALE, true);
-    new Hazard(50 / SCALE, 50 / SCALE, 200 / SCALE, 200 / SCALE);
-    player = new Player(100 / SCALE, 50 / SCALE);
-    overlay.init(stage);
-    doors = [new Door(200 / SCALE, 50 / SCALE, 400 / SCALE, 400 / SCALE)];
-    collectables = [new Collectable(100 / SCALE, 100 / SCALE, 200 / SCALE, "key")];
+  stage = new createjs.Stage(document.getElementById("game-canvas"));
+  setupPhysics();
+  setupInput();
 
-    createjs.Ticker.timingMode = createjs.Ticker.RAF;
-    createjs.Ticker.framerate = 60;
-    createjs.Ticker.on("tick", tick);
-    stage.update();
+  new Wall(0, 0, 10000 / SCALE, 200 / SCALE, true);
+  new Hazard(50 / SCALE, 50 / SCALE, 200 / SCALE, 200 / SCALE);
+  player = new Player(1920 / 2 / SCALE, 1080 / 2 / SCALE);
+  doors = [new Door(200 / SCALE, 50 / SCALE, 400 / SCALE, 400 / SCALE)];
+  collectables = [new Collectable(100 / SCALE, 100 / SCALE, 200 / SCALE, "key")];
+  overlay.init(stage);
+
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  createjs.Ticker.framerate = 60;
+}
+
+export function startTick() {
+  createjs.Ticker.on("tick", tick);
 }
 
 function setupPhysics() {
-    Box2D.Listen
-    world = new box2d.b2World(new box2d.b2Vec2(0, 0), false);
-    contactListener = new MyContactListener();
-    world.SetContactListener(contactListener);
+  Box2D.Listen
+  world = new box2d.b2World(new box2d.b2Vec2(0, 0), false);
+  contactListener = new MyContactListener();
+  world.SetContactListener(contactListener);
 
-    let debugDraw = new box2d.b2DebugDraw();
-    debugDraw.SetSprite(stage.canvas.getContext("2d"));
-    debugDraw.SetDrawScale(SCALE);
-    debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
-    world.SetDebugDraw(debugDraw);
+  let debugDraw = new box2d.b2DebugDraw();
+  debugDraw.SetSprite(stage.canvas.getContext("2d"));
+  debugDraw.SetDrawScale(SCALE);
+  debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
+  world.SetDebugDraw(debugDraw);
 }
 
 function tick() {
-  world.Step(1/60, 10, 10);
+  world.Step(1 / 60, 10, 10);
   world.DrawDebugData()
   world.ClearForces();
 
@@ -376,10 +379,11 @@ function tick() {
   for (let collectable of collectables) {
     collectable.tick();
   }
+  overlay.tick(player.body);
 }
 
 function setupInput() {
-  document.onkeydown = function(evt) {
+  document.onkeydown = function (evt) {
     switch (evt.key) {
       case 'a':
         input.left = true;
@@ -396,7 +400,7 @@ function setupInput() {
     }
   }
 
-  document.onkeyup = function(evt) {
+  document.onkeyup = function (evt) {
     switch (evt.key) {
       case 'a':
         input.left = false;
@@ -415,21 +419,14 @@ function setupInput() {
 
   //document.oncontextmenu = function(evt) { evt.preventDefault(); };
 
-  stage.on("stagemousedown", function(evt) { input.m1 = true; } );
+  stage.on("stagemousedown", function (evt) { input.m1 = true; });
 
-  stage.on("stagemouseup", function(evt) { input.m1 = false; } );
+  stage.on("stagemouseup", function (evt) { input.m1 = false; });
 
-  stage.on("stagemousemove", function(evt) {
+  stage.on("stagemousemove", function (evt) {
     input.mx = evt.stageX / SCALE;
     input.my = evt.stageY / SCALE;
   });
 }
 
 init();
-overlayTick(player.body);
-
-function overlayTick(body) {
-    //stage.update();
-    let vec = body.GetWorldCenter();
-    console.log(vec);
-}
