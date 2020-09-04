@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-import { startTick } from "./script.js"
-
-let stage, loader, player, grapple
-=======
 import {startTick} from "./script.js"
 
 let stage, loader, player
->>>>>>> Physics
 let canvas_height, canvas_width
 let map = [...Array(100)].map(() => [...Array(100)])
 let mapSize = map.length
@@ -76,7 +70,6 @@ function handleComplete() {
             mapContainerback.addChild(tile)
         }
     }
-<<<<<<< HEAD
     grapple = new createjs.Shape()
     grapple.scale = scale
     mapContainerorigin.scale = scale
@@ -107,17 +100,4 @@ export function tick(box2DPlayer) {
     if (box2DPlayer.isGrappling) {
         drawGrapple(box2DPlayer.grapple)
     }
-=======
-    mapContainerorigin.scale = scale
-    //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
-    stage.addChild(mapContainerback, player, mapContainerfront)
-    startTick()
-}
-
-export function tick(body) {
-    //stage.update()
-    let vec = body.GetPosition()
-    player.x = vec.x * 30 - canvas_width / 2
-    player.y = vec.y * 30 - canvas_height / 2
->>>>>>> Physics
 }
