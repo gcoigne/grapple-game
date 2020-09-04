@@ -43,16 +43,11 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
     if (bodyDataA instanceof Wall) {
       if (bodyDataB instanceof Player) {
         if (bodyDataB.isGrappling) {
-          //bodyDataB.endGrapple();
+          bodyDataB.endGrapple();
         }
       }
       else if (bodyDataB instanceof Grapple) {
-        if (bodyDataA.isSoft) {
-          bodyDataB.isStuck = true;
-        }
-        else {
-          bodyDataB.isDone = true;
-        }
+        bodyDataB.hitObject = bodyDataA;
       }
     }
 
@@ -62,6 +57,9 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
           bodyDataB.inventory["key"]--;
           bodyDataA.isOpen = true;
         }
+        if (bodyDataB.isGrappling) {
+          bodyDataB.endGrapple();
+        }
       }
     }
 
@@ -69,12 +67,32 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       if (bodyDataB instanceof Player) {
         player.isDead = true;
       }
+      else if (bodyDataB instanceof Grapple) {
+	grapple.isDone = true;
+      }
     }
+<<<<<<< Updated upstream
+=======
+    
+    else if (bodyDataA instanceof Box) {
+      if (bodyDataB instanceof Ground) {
+	bodyDataA.isGrounded = true;
+      }
+      else if (bodyDataB instanceof Player) {
+        if (bodyDataB.isGrappling) {
+          bodyDataB.endGrapple();
+        }
+      }
+      else if (bodyDataB instanceof Grapple) {
+          bodyDataB.hitObject = bodyDataA;
+      }
+    }
+>>>>>>> Stashed changes
 
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Wall) {
         if (bodyDataA.isGrappling) {
-          //bodyDataA.endGrapple();
+          bodyDataA.endGrapple();
         }
       }
       else if (bodyDataB instanceof Door) {
@@ -82,7 +100,21 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
           bodyDataA.inventory["key"]--;
           bodyDataB.isOpen = true;
         }
+        if (bodyDataA.isGrappling) {
+          bodyDataA.endGrapple();
+        }
       }
+<<<<<<< Updated upstream
+=======
+      else if (bodyDataB instanceof Hazard) {
+	bodyDataA.isDead = true;
+      }
+      else if (bodyDataB instanceof Box) {
+        if (bodyDataA.isGrappling) {
+          bodyDataA.endGrapple();
+        }
+      }
+>>>>>>> Stashed changes
       else if (bodyDataB instanceof Collectable) {
         if (!bodyDataB.isCollected) {
           console.log("a");
@@ -100,13 +132,13 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     else if (bodyDataA instanceof Grapple) {
       if (bodyDataB instanceof Wall) {
-        if (bodyDataB.isSoft) {
-          bodyDataA.isStuck = true;
-        }
-        else {
-          bodyDataA.isDone = true;
-        }
-        //bodyA.SetActive(false);
+        bodyDataA.hitObject = bodyDataB;
+      }
+      else if (bodyDataB instanceof Hazard) {
+	bodyDataA.isDone = true;
+      }
+      else if (bodyDataB instanceof Box) {
+        bodyDataA.hitObject = bodyDataB;
       }
     }
     
@@ -130,7 +162,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 //MyContactListener.prototype.constructor = MyContactListener;
 
 class Wall {
-  constructor(x, y, w, h, s) {
+  constructor(x, y, w, h) {
     let bodyDef = new box2d.b2BodyDef();
     bodyDef.type = box2d.b2Body.b2_staticBody;
     bodyDef.position.x = x;
@@ -143,7 +175,6 @@ class Wall {
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
-    this.isSoft = s;
   }
 }
 
@@ -181,10 +212,47 @@ class Hazard {
     fixDef.friction = 0.5;
     fixDef.restitution = 0.5;
     fixDef.shape = new box2d.b2PolygonShape();
+<<<<<<< Updated upstream
     fixDef.shape.SetAsBox(w / SCALE, h / SCALE);
+=======
+    fixDef.shape.SetAsBox(w, h);
+    fixDef.filter.categoryBits = categorys.STATIC;
+    fixDef.filter.maskBits = categorys.PLAYER | categorys.CREATURE;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
+  }
+}
+
+class Box {
+  constructor(x, y, w, h) {
+    let bodyDef = new box2d.b2BodyDef();
+    bodyDef.type = box2d.b2Body.b2_dynamicBody;
+    bodyDef.position.x = x;
+    bodyDef.position.y = y;
+    bodyDef.fixedRotation = true;
+    bodyDef.linearDamping = 5;
+    let fixDef = new box2d.b2FixtureDef();
+    fixDef.density = 0.5;
+    fixDef.friction = 0.5;
+    fixDef.restitution = 0;
+    fixDef.shape = new box2d.b2PolygonShape();
+    fixDef.shape.SetAsBox(w, h);
+    fixDef.filter.categoryBits = categorys.INTERACT;
+>>>>>>> Stashed changes
+    this.body = world.CreateBody(bodyDef);
+    this.fix = this.body.CreateFixture(fixDef);
+    this.body.SetUserData(this);
+    this.isGrounded = true;
+    this.isDead = false;
+  }
+  tick() {
+    if (!this.isGrounded && (!player.grapple || player.grapple.hitObject != this)) {
+      this.isDead = true;
+    }
+    if (this.isDead) {
+      this.body.SetActive(false);
+    }
   }
 }
 
@@ -194,19 +262,25 @@ class Player {
     bodyDef.type = box2d.b2Body.b2_dynamicBody;
     bodyDef.position.x = x;
     bodyDef.position.y = y;
-    bodyDef.linearDamping = 2;
+    bodyDef.linearDamping = 5;
     let fixDef = new box2d.b2FixtureDef();
     fixDef.density = 1;
     fixDef.friction = 0.5;
-    fixDef.restitution = 0.5;
+    fixDef.restitution = 0.25;
     fixDef.shape = new box2d.b2CircleShape(20 / SCALE);
     fixDef.filter.categoryBits = categorys.PLAYER;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
+<<<<<<< Updated upstream
     this.moveImpulse = 30 / SCALE;
     this.maxSpeed = 300 / SCALE;
+=======
+    this.moveImpulse = 2;
+    this.maxSpeed = 20;
+>>>>>>> Stashed changes
     this.isGrappling = false;
+    this.canGrapple = true;
     this.isDead = false;
     this.grapple = null;
     this.inventory = {};
@@ -219,14 +293,22 @@ class Player {
     grappleVel.Multiply(this.maxSpeed * 2);
     this.grapple = new Grapple(center.x, center.y, grappleVel);
     this.isGrappling = true;
+    this.canGrapple = false;
   }
 
   endGrapple() {
     this.grapple.isDone = true;
+    this.grapple.hitObject = null;
     this.isGrappling = false;
   }
 
   tick() {
+<<<<<<< Updated upstream
+=======
+    if (!this.isDead && !this.isGrounded && !(this.isGrappling && this.grapple.hitObject)) {
+      this.isDead = true;
+    }
+>>>>>>> Stashed changes
     if (this.isDead) {
       if (this.grapple) {
         world.DestroyBody(this.grapple.body);
@@ -247,16 +329,30 @@ class Player {
 
       if (input.m1) {
         if (this.isGrappling) {
-          if (this.grapple.isStuck) {
-            this.grapple.body.SetActive(false);
+          if (this.grapple.hitObject) {
+	    let grappleBody = this.grapple.body;
+	    let hitBody = this.grapple.hitObject.body;
+            grappleBody.SetActive(false);
             let playerCenter = this.body.GetWorldCenter();
-            let grappleCenter = this.grapple.body.GetWorldCenter();
-            let grappleAngle = Math.atan2(grappleCenter.y - playerCenter.y, grappleCenter.x - playerCenter.x);
-            let grappleImp = new box2d.b2Vec2(this.moveImpulse * 2 * Math.cos(grappleAngle), this.moveImpulse * 2 * Math.sin(grappleAngle));
-            this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
+            let grappleCenter = grappleBody.GetWorldCenter();
+	    let hitCenter = hitBody.GetWorldCenter();
+	    if (hitBody.GetType() == box2d.b2Body.b2_dynamicBody) {
+              let grappleAngle = Math.atan2(hitCenter.y - playerCenter.y, hitCenter.x - playerCenter.x);
+              let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
+	      grappleImp.Multiply(2);
+              this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
+	      grappleImp.Multiply(-1);
+	      hitBody.ApplyImpulse(grappleImp, hitBody.GetWorldCenter());
+	      this.grapple.body.SetPosition(hitCenter);
+	    }
+	    else {
+              let grappleAngle = Math.atan2(grappleCenter.y - playerCenter.y, grappleCenter.x - playerCenter.x);
+              let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
+              this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
+	    }
           }
         }
-        else {
+        else if (this.canGrapple) {
           this.useGrapple();
         }
       }
@@ -264,17 +360,23 @@ class Player {
         if (this.isGrappling) {
           this.endGrapple();
         }
-        else {
-          if (this.body.m_linearVelocity.Length() > this.maxSpeed) {
-            this.body.m_linearVelocity.Multiply(this.maxSpeed / this.body.m_linearVelocity.Length());
-          }
-        }
+        this.canGrapple = true;
       }
+    }
+	
+    if (this.isGrappling && this.grapple.hitObject && !this.grapple.hitObject.body.IsActive()) {
+      this.endGrapple();
     }
 
     if (this.grapple && this.grapple.isDone) {
       world.DestroyBody(this.grapple.body);
       this.grapple = null;
+    }
+
+    if (!this.isGrappling || !this.grapple || ! this.grapple.hitObject) {
+      if (this.body.m_linearVelocity.Length() > this.maxSpeed) {
+        this.body.m_linearVelocity.Multiply(this.maxSpeed / this.body.m_linearVelocity.Length());
+      }
     }
   }
 }
@@ -290,11 +392,16 @@ class Grapple {
     fixDef.friction = 1;
     fixDef.shape = new box2d.b2CircleShape(5 / SCALE);
     fixDef.filter.categoryBits = categorys.PROJECTILE;
+<<<<<<< Updated upstream
     fixDef.filter.maskBits = categorys.STATIC;
+=======
+    fixDef.filter.maskBits = categorys.STATIC | categorys.INTERACT;
+>>>>>>> Stashed changes
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
     this.body.SetLinearVelocity(v);
+    this.hitObject;
     this.isDone = false;
   }
 }
@@ -325,7 +432,7 @@ class Collectable {
 
 
 let SCALE = 30;
-let stage, world, contactListener, player, doors, collectables;
+let stage, world, contactListener, player, doors, boxes, collectables;
 
 function init() {
     stage = new createjs.Stage(document.getElementById("game-canvas"));
@@ -369,6 +476,10 @@ function tick() {
 
   for (let door of doors) {
     door.tick();
+  }
+
+  for (let box of boxes) {
+    box.tick();
   }
 
   for (let collectable of collectables) {
@@ -423,8 +534,21 @@ function setupInput() {
   });
 }
 
+<<<<<<< Updated upstream
 init();
 overlayTick(player.body);
+=======
+function createLevel() {
+  new Wall(1920 / 2 / SCALE, 9 / SCALE, 300 / SCALE, 30 / SCALE, true);
+  new Hazard(50 / SCALE, 50 / SCALE, 30 / SCALE, 30 / SCALE);
+  player = new Player(1920 / 2 / SCALE, 1080 / 2 / SCALE);
+  doors = [new Door(200 / SCALE, 50 / SCALE, 60 / SCALE, 30 / SCALE)];
+  boxes = [new Box(1500 / SCALE, 1080 / 2 / SCALE, 30 / SCALE, 30 / SCALE)];
+  collectables = [new Collectable(100 / SCALE, 100 / SCALE, 10 / SCALE, "key")];
+  new Ground(1920 / 2 / SCALE, 1080 / 2 / SCALE, 120 / SCALE, 120 / SCALE);
+  new Ground(1500 / SCALE, 1080 / 2 / SCALE, 120 / SCALE, 120 / SCALE);
+}
+>>>>>>> Stashed changes
 
 function overlayTick(body) {
     //stage.update();
