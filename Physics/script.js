@@ -87,7 +87,6 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       if (bodyDataB instanceof Ground) {
 	bodyDataA.isGrounded = true;
       }
-    }
       else if (bodyDataB instanceof Player) {
         if (bodyDataB.isGrappling) {
           bodyDataB.endGrapple();
@@ -100,7 +99,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Ground) {
-	bodyDataA.isGrounded = true;
+	    bodyDataA.isGrounded = true;
       }
       if (bodyDataB instanceof Wall) {
         if (bodyDataA.isGrappling) {
@@ -117,20 +116,21 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         }
       }
       else if (bodyDataB instanceof Hazard) {
-	bodyDataA.isDead = true;
+	    bodyDataA.isDead = true;
       }
       else if (bodyDataB instanceof Box) {
         if (bodyDataA.isGrappling) {
           bodyDataA.endGrapple();
         }
       }
+    }
 
     else if (bodyDataA instanceof Grapple) {
       if (bodyDataB instanceof Wall) {
         bodyDataA.hitObject = bodyDataB;
       }
       else if (bodyDataB instanceof Hazard) {
-	bodyDataA.isDone = true;
+	    bodyDataA.isDone = true;
       }
       else if (bodyDataB instanceof Box) {
         bodyDataA.hitObject = bodyDataB;
