@@ -467,9 +467,6 @@ function tick() {
   for (let collectable of collectables) {
     collectable.tick();
   }
-  if(createjs.Ticker.getMeasuredFPS() < 50){
-    console.log(createjs.Ticker.getMeasuredFPS())
-  }
   overlay.tick(player);
 }
 
@@ -526,7 +523,7 @@ function createLevel() {
   player = new Player(1920 / 2 / SCALE, 1080 / 2 / SCALE);
   doors = [new Door(200 / SCALE, 50 / SCALE, 60 / SCALE, 30 / SCALE)];
   collectables = [new Collectable(100 / SCALE, 100 / SCALE, 10 / SCALE, "key")];
-  new Ground(1920 / 2 / SCALE, 1080 / 2 / SCALE, 1920 / 8 / SCALE, 1080 / 8 / SCALE);
+  new Ground(1920 / 2 / SCALE, 1080 / 2 / SCALE, 32 * 8 / SCALE, 32 * 8 / SCALE);
 }
 
 init();
