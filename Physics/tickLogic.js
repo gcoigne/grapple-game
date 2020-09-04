@@ -1,6 +1,6 @@
-import {startTick} from "./script.js"
+import { startTick } from "./script.js"
 
-let stage, loader, player
+let stage, loader, player, grapple
 let canvas_height, canvas_width
 let map = [...Array(100)].map(() => [...Array(100)])
 let mapSize = map.length
@@ -97,7 +97,7 @@ export function tick(box2DPlayer) {
     let vec = box2DPlayer.body.GetPosition()
     player.x = vec.x * 30 - canvas_width / 2
     player.y = vec.y * 30 - canvas_height / 2
-    if (box2DPlayer.isGrappling) {
+    if (box2DPlayer.isGrappling && box2DPlayer.grapple) {
         drawGrapple(box2DPlayer.grapple)
     }
 }

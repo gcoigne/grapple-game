@@ -398,11 +398,12 @@ class Player {
       }
     }
 	
-    if (this.isGrappling && this.grapple.hitObject && !this.grapple.hitObject.body.IsActive()) {
+    if (this.isGrappling && this.grapple && this.grapple.hitObject && !this.grapple.hitObject.body.IsActive()) {
       this.endGrapple();
     }
 
     if (this.grapple && this.grapple.isDone) {
+      this.isGrappling = false;
       world.DestroyBody(this.grapple.body);
       this.grapple = null;
     }
