@@ -121,7 +121,7 @@ export function tick(box2DPlayer) {
     let vec = box2DPlayer.body.GetPosition()
     player.x = vec.x * 30 - canvas_width / 2
     player.y = vec.y * 30 - canvas_height / 2
-    if (box2DPlayer.isGrappling) {
+    if (box2DPlayer.isGrappling && box2DPlayer.grapple) {
         drawGrapple(box2DPlayer.grapple)
     }
 }
