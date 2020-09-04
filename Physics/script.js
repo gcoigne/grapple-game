@@ -215,7 +215,7 @@ class Player {
   }
 
   useGrapple() {
-    let center = this.body.GetWorldCenter();
+    let center = this.body.GetPosition();
     let grappleAngle = Math.atan2(input.my - center.y, input.mx - center.x);
     let grappleVel = new box2d.b2Vec2(Math.cos(grappleAngle), Math.sin(grappleAngle));
     grappleVel.Multiply(this.maxSpeed * 2);
@@ -224,6 +224,7 @@ class Player {
   }
 
   endGrapple() {
+    overlay.clearOverlayGrapple()
     this.grapple.isDone = true;
     this.isGrappling = false;
   }
@@ -379,7 +380,10 @@ function tick() {
   for (let collectable of collectables) {
     collectable.tick();
   }
-  overlay.tick(player.body);
+  if(createjs.Ticker.getMeasuredFPS() < 50){
+    console.log(createjs.Ticker.getMeasuredFPS())
+  }
+  overlay.tick(player);
 }
 
 function setupInput() {
