@@ -10,7 +10,7 @@ let lastlocx = 0    //in pixels
 let lastlocy = 0    //in pixels
 let chunkSize = 5   // needs to be a prime number
 let tile
-let scale = 3
+let scale = 3.2
 let offsetx, offsety
 let mapContainerfront = new createjs.Container()
 let mapContainerback = new createjs.Container()
@@ -73,8 +73,32 @@ function handleComplete() {
     grapple = new createjs.Shape()
     grapple.scale = scale
     mapContainerorigin.scale = scale
-    stage.addChild(mapContainerback, player, grapple, mapContainerfront)
+    stage.addChild(mapContainerfloor, mapContainerback, player, grapple, mapContainerfront)
     startTick()
+}
+
+export function overlayGround(x, y) {
+    let newTile = new createjs.Shape()
+    tile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, 32, 32)
+    tile.scale = scale
+    tile.cache(0, 0, 32, 32)
+    tile.x = (x * 32) * scale + offsetx
+    tile.y = (y * 32) * scale + offsety
+    mapContainerfloor.addChild(newTile)
+}
+
+export function overlayBack(x, y, l, w, type) {
+    let newBackWall = new createjs.Shape()
+    tile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
+    tile.scale = scale
+    tile.cache(0, 0, 32, 32)
+    tile.x = (x * 32) * scale + offsetx
+    tile.y = (y * 32) * scale + offsety
+    mapContainerfloor.addChild(newTile)
+}
+
+export function overlayFront(x, y) {
+
 }
 
 export function clearOverlayGrapple() {
@@ -93,7 +117,7 @@ function drawGrapple(box2DGrapple) {
 }
 
 export function tick(box2DPlayer) {
-    stage.update()
+    //stage.update()
     let vec = box2DPlayer.body.GetPosition()
     player.x = vec.x * 30 - canvas_width / 2
     player.y = vec.y * 30 - canvas_height / 2
