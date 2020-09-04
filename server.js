@@ -1,12 +1,13 @@
 const express = require("express");
-const sqlite3 = require('sqlite3').verbose();
 const app = express();
+const sqlite3 = require("sqlite3").verbose();
+
 
 const port = 3000;
 const hostname = "localhost";
 
-app.use(express.static("public_html"));
 app.use(express.json());
+app.use(express.static("public_html"));
 
 let db = new sqlite3.Database('./finalProject.db', (err) => {
     if (err) {
@@ -15,79 +16,104 @@ let db = new sqlite3.Database('./finalProject.db', (err) => {
     console.log('Connected to finalProject db in sqlite');
   });
 
-  //check if database exists
-  db.run('CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, name text NOT NULL, password text NOT NULL);', function(err) {
-    if(err){
-      return console.log(err.message);
-    }
-    console.log("table created");
+//check if database exists
+db.run('CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, name text NOT NULL, password text NOT NULL);', function(err) {
+  if(err){
+    return console.log(err.message);
+  }
+  //console.log("table created");
     
-  });
+});
 
-
+db.close(); 
 
 app.get("/get", function (req, res) {
+  let user = req.query.user;
+  let pwd = req.query.pwd; 
   let db = new sqlite3.Database('./finalProject.db', (err) => {
   if (err) {
     console.log(err.message);
   }
-  //console.log('Connected to finalProject db in sqlite');
   });
-  let id = req.query.id;
-  let sql = `SELECT user_id, name FROM users WHERE user_id = ?;`;
- 
-  db.get(sql, [id], (err, row) => {
-    if (err) {
-      return console.error(err.message);
+  let sql = `SELECT user_id,
+                    name, 
+                    password
+            FROM users
+            WHERE name  = ?`;
+
+// first row only
+db.get(sql, [user], (err, row) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  else if(row.password === pwd){
+    console.log("Passwords match!");
     }
-    return row
-    ? console.log(row.user_id, row.name)
-      : console.log(`No user found with the id ${id}`);
-  });
- 
+  else{
+    console.log("Password does not match the user that was entered.");
+    }
+
+  //? console.log(row.user_id, row.name)
+  //: console.log(`No playlist found with the id ${user}`);
+  
+});
+
   db.close();
-  res.send("in the get route");
+/*
+let db2 = new sqlite3.Database('./finalProject.db', (err) => {
+  if (err) {
+    console.log(err.message);
+  }
+  });
+
+let sql2 = `SELECT * FROM users`;
+
+db2.all(sql2, [], (err, rows) => {
+if (err) {
+  throw err;
+}
+rows.forEach((row) => {
+console.log(row);
+});
+});
+
+// close the database connection
+db2.close();
+*/
 });
 
 app.post("/add", function (req, res) {
-  let username = req.body.user;
-  let pwd = req.body.password; 
-  //console.log("name:", name);
-  //let name = "Keziah";
-  //let password = "123";
-  console.log(username);
-  console.log(pwd);
-  //let data = [name, password];
-  //let placeholders = data.map((d) => '(?)').join(',');
+  let username = req.body.username;
+  let pwd = req.body.plaintextPassword; 
+  
+  //console.log("user: ", username);
+  //console.log("plaintext password:",pwd);
+  
   let db = new sqlite3.Database('./finalProject.db', (err) => {
     if (err) {
       console.log(err.message);
     }
-    //console.log('Connected to finalProject db in sqlite');
   });
-  //let sql = 'INSERT INTO users(name, password) VALUES ' + placeholders;
 
-  db.run('INSERT INTO users(name, password) VALUES(Hello, passworld)', [], function(err) {
+  db.run('INSERT INTO users(name, password) VALUES(?,?)', [username, pwd], function(err) {
     if (err) {
       return console.log(err.message);
     }
     // get the last insert id
-    console.log(`A row has been inserted with name ${username}`);
+    console.log(`A row has been inserted with rowid ${this.lastID}`);
   });
  
   db.close();
-  res.send("in the add route");
+  res.status(200);
 });
 
 app.post("/delete", function (req, res) {
   let deletion = req.body.delete;
-  console.log(deletion);
 
   let db = new sqlite3.Database('./finalProject.db', (err) => {
     if (err) {
       console.log(err.message);
     }
-    //console.log('Connected to finalProject db in sqlite');
   });
   
 // delete a row based on name
@@ -102,18 +128,18 @@ app.post("/delete", function (req, res) {
 });
 
 app.post("/edit", function (req, res) {
+  let toEdit = req.body.edit; 
+  let user = req.body.username;  
   let db = new sqlite3.Database('./finalProject.db', (err) => {
     if (err) {
       console.log(err.message);
     }
-    console.log('Connected to finalProject db in sqlite');
   });
-  let data = ['Keziah Zapanta', 'Keziah'];
   let sql = `UPDATE users
           SET name = ?
           WHERE name = ?`;
 
-  db.run(sql, data, function(err) {
+  db.run(sql, [toEdit, user], function(err) {
     if (err) {
      return console.error(err.message);
     }
@@ -121,7 +147,6 @@ app.post("/edit", function (req, res) {
 
   });
   db.close();
-  res.send("in the edit route");
 });
 
 app.listen(port, hostname, () => {
