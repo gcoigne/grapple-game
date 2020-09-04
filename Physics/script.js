@@ -42,6 +42,15 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
     let bodyB = fixB.GetBody();
     let bodyDataB = bodyB.GetUserData();
 
+    if (bodyDataA instanceof Ground) {
+      if (bodyDataB instanceof Player) {
+	bodyDataB.isGrounded = true;
+      }
+      else if (bodyDataB instanceof Box) {
+	bodyDataB.isGrounded = true;
+      }
+    }
+
     if (bodyDataA instanceof Wall) {
       if (bodyDataB instanceof Player) {
         if (bodyDataB.isGrappling) {
@@ -72,8 +81,17 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         player.isDead = true;
       }
     }
+    
+    else if (bodyDataA instanceof Box) {
+      if (bodyDataB instanceof Ground) {
+	bodyDataA.isGrounded = true;
+      }
+    }
 
     else if (bodyDataA instanceof Player) {
+      if (bodyDataB instanceof Ground) {
+	bodyDataA.isGrounded = true;
+      }
       if (bodyDataB instanceof Wall) {
         if (bodyDataA.isGrappling) {
           //bodyDataA.endGrapple();
@@ -85,9 +103,11 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
           bodyDataB.isOpen = true;
         }
       }
+      else if (bodyDataB instanceof Hazard) {
+	bodyDataA.isDead = true;
+      }
       else if (bodyDataB instanceof Collectable) {
         if (!bodyDataB.isCollected) {
-          console.log("a");
           bodyDataB.isCollected = true;
           let type = bodyDataB.collectableType;
           if (type in player.inventory) {
@@ -127,9 +147,54 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       }
     }
   }
+  EndContact(contact) {
+    let fixA = contact.GetFixtureA();
+    let bodyA = fixA.GetBody();
+    let bodyDataA = bodyA.GetUserData();
+    let fixB = contact.GetFixtureB();
+    let bodyB = fixB.GetBody();
+    let bodyDataB = bodyB.GetUserData();
+
+    if (bodyDataA instanceof Ground) {
+      if (bodyDataB instanceof Player) {
+	bodyDataB.isGrounded = false;
+      }
+      else if (bodyDataB instanceof Box) {
+	bodyDataB.isGrounded = false;
+      }
+    }
+    else if (bodyDataA instanceof Box) {
+      if (bodyDataB instanceof Ground) {
+	bodyDataA.isGrounded = false;
+      }
+    }    
+    else if (bodyDataA instanceof Player) {
+      if (bodyDataB instanceof Ground) {
+        bodyDataA.isGrounded = false;
+      }
+    }
+  }
 }
 //MyContactListener.prototype = new Box2D.Dynamics.b2ContactListener();
 //MyContactListener.prototype.constructor = MyContactListener;
+
+
+class Ground {
+  constructor(x, y, w, h) {
+    let bodyDef = new box2d.b2BodyDef();
+    bodyDef.type = box2d.b2Body.b2_staticBody;
+    bodyDef.position.x = x;
+    bodyDef.position.y = y;
+    let fixDef = new box2d.b2FixtureDef();
+    fixDef.isSensor = true;
+    fixDef.shape = new box2d.b2PolygonShape();
+    fixDef.shape.SetAsBox(w, h);
+    fixDef.filter.categoryBits = categorys.STATIC;
+    this.body = world.CreateBody(bodyDef);
+    this.fix = this.body.CreateFixture(fixDef);
+    this.body.SetUserData(this);
+  }
+}
 
 class Wall {
   constructor(x, y, w, h, s) {
@@ -139,9 +204,9 @@ class Wall {
     bodyDef.position.y = y;
     let fixDef = new box2d.b2FixtureDef();
     fixDef.friction = 0.5;
-    fixDef.restitution = 0.5;
+    fixDef.restitution = 0;
     fixDef.shape = new box2d.b2PolygonShape();
-    fixDef.shape.SetAsBox(w / SCALE, h / SCALE);
+    fixDef.shape.SetAsBox(w, h);
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
@@ -157,9 +222,9 @@ class Door {
     bodyDef.position.y = y;
     let fixDef = new box2d.b2FixtureDef();
     fixDef.friction = 0.5;
-    fixDef.restitution = 0.5;
+    fixDef.restitution = 0;
     fixDef.shape = new box2d.b2PolygonShape();
-    fixDef.shape.SetAsBox(w / SCALE, h / SCALE);
+    fixDef.shape.SetAsBox(w, h);
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
@@ -183,7 +248,30 @@ class Hazard {
     fixDef.friction = 0.5;
     fixDef.restitution = 0.5;
     fixDef.shape = new box2d.b2PolygonShape();
-    fixDef.shape.SetAsBox(w / SCALE, h / SCALE);
+    fixDef.shape.SetAsBox(w, h);
+    fixDef.filter.categoryBits = categorys.STATIC;
+    fixDef.filter.maskBits = categorys.PLAYER || categorys.CREATURE;
+    this.body = world.CreateBody(bodyDef);
+    this.fix = this.body.CreateFixture(fixDef);
+    this.body.SetUserData(this);
+  }
+}
+
+class Box {
+  constructor(x, y, w, h) {
+    let bodyDef = new box2d.b2BodyDef();
+    bodyDef.type = box2d.b2Body.b2_staticBody;
+    bodyDef.position.x = x;
+    bodyDef.position.y = y;
+    bodyDef.fixedRotation = true;
+    bodyDef.linearDamping = 2;
+    let fixDef = new box2d.b2FixtureDef();
+    fixDef.density = 0.5;
+    fixDef.friction = 0.5;
+    fixDef.restitution = 0;
+    fixDef.shape = new box2d.b2PolygonShape();
+    fixDef.shape.SetAsBox(w, h);
+    fixDef.filter.categoryBits = categorys.INTERACT;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
@@ -206,10 +294,11 @@ class Player {
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
-    this.moveImpulse = 30 / SCALE;
-    this.maxSpeed = 300 / SCALE;
+    this.moveImpulse = 1;
+    this.maxSpeed = 10;
     this.isGrappling = false;
     this.isDead = false;
+    this.isGrounded = true;
     this.grapple = null;
     this.inventory = {};
   }
@@ -229,6 +318,9 @@ class Player {
   }
 
   tick() {
+    if (!this.isDead && !this.isGrounded && !(this.isGrappling && this.grapple.isStuck)) {
+      this.isDead = true;
+    }
     if (this.isDead) {
       if (this.grapple) {
         world.DestroyBody(this.grapple.body);
@@ -292,7 +384,7 @@ class Grapple {
     fixDef.friction = 1;
     fixDef.shape = new box2d.b2CircleShape(5 / SCALE);
     fixDef.filter.categoryBits = categorys.PROJECTILE;
-    fixDef.filter.maskBits = categorys.STATIC;
+    fixDef.filter.maskBits = categorys.STATIC || categorys.INTERACT;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
@@ -308,7 +400,7 @@ class Collectable {
     bodyDef.position.x = x;
     bodyDef.position.y = y;
     let fixDef = new box2d.b2FixtureDef();
-    fixDef.shape = new box2d.b2CircleShape(r / SCALE);
+    fixDef.shape = new box2d.b2CircleShape(r);
     fixDef.filter.categoryBits = categorys.INTERACT;
     fixDef.filter.maskBits = categorys.PLAYER;
     fixDef.isSensor = true;
@@ -334,12 +426,7 @@ function init() {
   stage = new createjs.Stage(document.getElementById("game-canvas"));
   setupPhysics();
   setupInput();
-
-  new Wall(0, 0, 10000 / SCALE, 200 / SCALE, true);
-  new Hazard(50 / SCALE, 50 / SCALE, 200 / SCALE, 200 / SCALE);
-  player = new Player(1920 / 2 / SCALE, 1080 / 2 / SCALE);
-  doors = [new Door(200 / SCALE, 50 / SCALE, 400 / SCALE, 400 / SCALE)];
-  collectables = [new Collectable(100 / SCALE, 100 / SCALE, 200 / SCALE, "key")];
+  createLevel();
   overlay.init(stage);
 
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
@@ -427,6 +514,15 @@ function setupInput() {
     input.mx = evt.stageX / SCALE;
     input.my = evt.stageY / SCALE;
   });
+}
+
+function createLevel() {
+  new Wall(1920 / 2 / SCALE, 9 / SCALE, 300 / SCALE, 30 / SCALE, true);
+  new Hazard(50 / SCALE, 50 / SCALE, 30 / SCALE, 30 / SCALE);
+  player = new Player(1920 / 2 / SCALE, 1080 / 2 / SCALE);
+  doors = [new Door(200 / SCALE, 50 / SCALE, 60 / SCALE, 30 / SCALE)];
+  collectables = [new Collectable(100 / SCALE, 100 / SCALE, 10 / SCALE, "key")];
+  new Ground(1920 / 2 / SCALE, 1080 / 2 / SCALE, 1920 / 8 / SCALE, 1080 / 8 / SCALE);
 }
 
 init();
