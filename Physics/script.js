@@ -47,7 +47,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         bodyDataB.numGroundTouching++;
       }
       else if (bodyDataB instanceof Box) {
-        bodyDataB.isGrounded = true;
+        bodyDataB.numGroundTouching++;
       }
     }
 
@@ -114,7 +114,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     else if (bodyDataA instanceof Box) {
       if (bodyDataB instanceof Ground) {
-        bodyDataA.isGrounded = true;
+        bodyDataA.numGroundTouching++;
       }
       else if (bodyDataB instanceof Player) {
         if (bodyDataB.isGrappling) {
@@ -210,12 +210,12 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         bodyDataB.numGroundTouching--;
       }
       else if (bodyDataB instanceof Box) {
-        bodyDataB.isGrounded = false;
+        bodyDataB.numGroundTouching--;
       }
     }
     else if (bodyDataA instanceof Box) {
       if (bodyDataB instanceof Ground) {
-        bodyDataA.isGrounded = false;
+        bodyDataA.numGroundTouching--;
       }
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects--;
@@ -408,12 +408,12 @@ class Box {
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
     this.body.SetUserData(this);
-    this.isGrounded = true;
+    this.numGroundTouching = 1;
     this.isDead = false;
     bodys.push(this.body);
   }
   tick() {
-    if (!this.isGrounded && (!player.grapple || player.grapple.hitObject != this)) {
+    if (this.numGroundTouching == 0 && (!player.grapple || player.grapple.hitObject != this)) {
       this.isDead = true;
     }
     if (this.isDead) {
