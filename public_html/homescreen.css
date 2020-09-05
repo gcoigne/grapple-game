@@ -1,0 +1,36 @@
+body{
+  background-color: black;
+  text-align: center;
+  
+}
+h1{
+  color: white;
+  font-size: 400%;
+}
+
+.button-container-div{
+  height: 300px; 
+  position: relative; 
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.button {
+  background-color: gray; 
+  border: 2px solid black ;
+  color: white; 
+  text-align: center;
+  font-size: 50px;
+  border-radius: 10px;
+  margin: auto;
+  outline: none;
+ 
+}
+

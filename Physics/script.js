@@ -603,7 +603,7 @@ function init() {
   setupInput();
   loadLevel(0);
   overlay.init(stage);
-  createLevel(0);
+  loadLevel(0);
 
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.framerate = 60;
