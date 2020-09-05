@@ -603,7 +603,6 @@ function init() {
   setupInput();
   loadLevel(0);
   overlay.init(stage);
-  loadLevel(0);
 
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.framerate = 60;
@@ -653,7 +652,7 @@ function tick() {
   if (createjs.Ticker.getMeasuredFPS() < 50) {
     //console.log(createjs.Ticker.getMeasuredFPS())
   }
-  overlay.tick(player);
+  overlay.tick(player, boxes);
 }
 
 function setupInput() {
@@ -712,11 +711,11 @@ function loadLevel(l) {
   switch(l) {
     case 0:
       player = new Player(256 / SCALE, 960 / SCALE);
-      new Ground(960 / SCALE, 960 / SCALE, 960 / SCALE, 160 / SCALE);
+      new Ground(960 / SCALE, 928 / SCALE, 960 / SCALE, 160 / SCALE);
       new Ground(1760 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
       new Ground(160 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(960 / SCALE, 1024 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(960 / SCALE, 1056 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
       new Wall(1888 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
       new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 64 / SCALE);
@@ -727,22 +726,23 @@ function loadLevel(l) {
       break;
     case 1:
       player = new Player(256 / SCALE, 960 / SCALE);
-      new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
-      new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
-      new Ground(1440 / SCALE, 832 / SCALE, 480 / SCALE, 160 / SCALE);
+      //new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
+      //new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
+      //new Ground(1440 / SCALE, 864 / SCALE, 480 / SCALE, 160 / SCALE);
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(960 / SCALE, 1056 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
       new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Wall(960 / SCALE, 584 / SCALE, 64 / SCALE, 384 / SCALE);
+      new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
       new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
-      new Wall(1504 / SCALE, 352 / SCALE, 64 / SCALE, 160 / SCALE);
-      doors = [new Door(960 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE), new Door(1472 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE)];
+      new Wall(1472 / SCALE, 352 / SCALE, 64 / SCALE, 160 / SCALE);
+      doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
       boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
       new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]);
       new Button(1184 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[1]);
       collectables = [];
       transitions = [new Transition(1736 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 0)];
+      overlay.generatelevel2()
   }
   levelIndex = l;
 }
