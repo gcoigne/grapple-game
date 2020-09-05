@@ -713,12 +713,12 @@ function loadLevel(l) {
     case 0:
       player = new Player(256 / SCALE, 960 / SCALE);
       new Ground(960 / SCALE, 960 / SCALE, 960 / SCALE, 160 / SCALE);
-      new Ground(1736 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);
-      new Ground(180 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);
+      new Ground(1760 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
+      new Ground(160 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(960 / SCALE, 1024 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(32 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
+      new Wall(1888 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
       new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 64 / SCALE);
       doors = [];
       boxes = [];

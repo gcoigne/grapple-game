@@ -12,8 +12,7 @@ let chunkSize = 5   // needs to be a prime number
 let tile
 let scale = 2
 let offsetx, offsety
-let mapContainerfront = new createjs.Container()
-let mapContainerback = new createjs.Container()
+let mapContainerwall = new createjs.Container()
 let mapContainerfloor = new createjs.Container()
 let mapContainerorigin = new createjs.Container()
 let lfHeld, rtHeld, fwHeld, bkHeld
@@ -31,14 +30,14 @@ export function init(mainLoopStage) {
     stage = mainLoopStage
     let manifest = [
         { src: "floor_tile.png", id: "0" },
-        { src: "topdown_wall_pats/top.png", id: "1" },
-        { src: "topdown_wall_pats/bottom.png", id: "2" },
-        { src: "topdown_wall_pats/left.png", id: "3" },
-        { src: "topdown_wall_pats/right.png", id: "4" },
-        { src: "topdown_wall_pats/top_left.png", id: "5" },
-        { src: "topdown_wall_pats/top_right.png", id: "6" },
-        { src: "topdown_wall_pats/bottom_left.png", id: "7" },
-        { src: "topdown_wall_pats/bottom_right.png", id: "8" },
+        { src: "topdown_wall_parts/top.png", id: "1" },
+        { src: "topdown_wall_parts/bottom.png", id: "2" },
+        { src: "topdown_wall_parts/left.png", id: "3" },
+        { src: "topdown_wall_parts/right.png", id: "4" },
+        { src: "topdown_wall_parts/top_left.png", id: "5" },
+        { src: "topdown_wall_parts/top_right.png", id: "6" },
+        { src: "topdown_wall_parts/bottom_left.png", id: "7" },
+        { src: "topdown_wall_parts/bottom_right.png", id: "8" },
     ]
 
     loader = new createjs.LoadQueue(false)
@@ -57,18 +56,33 @@ function handleComplete() {
     grapple = new createjs.Shape()
     grapple.scale = scale
     mapContainerorigin.scale = scale
-    stage.addChild(mapContainerfloor, mapContainerback, player, grapple, mapContainerfront)
+    stage.addChild(mapContainerfloor, mapContainerwall, player, grapple)
     startTick()
 }
 
 function generatelevel1() {
-    overlayGround(960, 512, 32, 32)
     overlayGround(960, 960, 960, 160)
-    overlayGround(1736, 192, 160, 160)
-    overlayGround(180, 192, 160, 160)
+    overlayGround(1760, 160, 160, 160)
+    overlayGround(160, 160, 160, 160)
+    overlayWall(960, 32, 960, 32, "1")
+    overlayWall(960, 1024, 960, 32, "2")
+
+    overlayWall(1888, 544, 32, 480, "4")
+    overlayWall(1888, 32, 32, 32, "6")
+    overlayWall(1888, 1024, 32, 32, "8")
+
+    overlayWall(32, 544, 32, 480, "3")
+    overlayWall(32, 32, 32, 32, "5")
+    overlayWall(32, 1024, 32, 32, "7")
+
+    overlayWall(32, 352, 32, 32, "7")
+    overlayWall(32, 416, 32, 32, "5")
+    //no time left to make the extra sprites
+    overlayWall(480, 352, 416+64, 32, "2")
+    overlayWall(480, 416, 416+64, 32, "1")
 }
 
-export function overlayGround(x, y, l, w) {
+function overlayGround(x, y, l, w) {
     let newTile = new createjs.Shape()
     newTile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
     newTile.scale = scale
@@ -78,18 +92,14 @@ export function overlayGround(x, y, l, w) {
     mapContainerfloor.addChild(newTile)
 }
 
-export function overlayBack(x, y, l, w, type) {
+function overlayWall(x, y, l, w, type) {
     let newBackWall = new createjs.Shape()
-    newBackWall.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
+    newBackWall.graphics.beginBitmapFill(loader.getResult(type), "repeat").drawRect(0, 0, l, w)
     newBackWall.scale = scale
-    newBackWall.cache(0, 0, 32, 32)
-    newBackWall.x = (x * 32) * scale + offsetx
-    newBackWall.y = (y * 32) * scale + offsety
-    mapContainerfloor.addChild(newBackWall)
-}
-
-export function overlayFront(x, y) {
-
+    newBackWall.cache(0, 0, l, w)
+    newBackWall.x = Math.floor(x / 32) * 32 - l
+    newBackWall.y = Math.floor(y / 32) * 32 - w
+    mapContainerwall.addChild(newBackWall)
 }
 
 export function clearOverlayGrapple() {
