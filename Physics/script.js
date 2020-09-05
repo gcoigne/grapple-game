@@ -44,10 +44,10 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     if (bodyDataA instanceof Ground) {
       if (bodyDataB instanceof Player) {
-	bodyDataB.isGrounded = true;
+        bodyDataB.isGrounded = true;
       }
       else if (bodyDataB instanceof Box) {
-	bodyDataB.isGrounded = true;
+        bodyDataB.isGrounded = true;
       }
     }
 
@@ -73,7 +73,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         }
       }
       else if (bodyDataB instanceof Grapple) {
-	bodyDataB.isDone = true;
+        bodyDataB.isDone = true;
       }
     }
 
@@ -82,17 +82,17 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         bodyDataB.isDead = true;
       }
       else if (bodyDataB instanceof Grapple) {
-	bodyDataB.isDone = true;
+        bodyDataB.isDone = true;
       }
     }
 
     else if (bodyDataA instanceof Button) {
       bodyDataA.numPressingObjects++;
       if (bodyDataA.numPressingObjects == 1) {
-	bodyDataA.linkedObject.buttonStart();
+        bodyDataA.linkedObject.buttonStart();
       }
     }
-    
+
     else if (bodyDataA instanceof Transition) {
       bodyDataA.isTouched = true;
     }
@@ -111,10 +111,10 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         }
       }
     }
-    
+
     else if (bodyDataA instanceof Box) {
       if (bodyDataB instanceof Ground) {
-	bodyDataA.isGrounded = true;
+        bodyDataA.isGrounded = true;
       }
       else if (bodyDataB instanceof Player) {
         if (bodyDataB.isGrappling) {
@@ -124,17 +124,17 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects++;
         if (bodyDataB.numPressingObjects == 1) {
-	  bodyDataB.linkedObject.buttonStart();
+          bodyDataB.linkedObject.buttonStart();
         }
       }
       else if (bodyDataB instanceof Grapple) {
-          bodyDataB.hitObject = bodyDataA;
+        bodyDataB.hitObject = bodyDataA;
       }
     }
 
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Ground) {
-	    bodyDataA.isGrounded = true;
+        bodyDataA.isGrounded = true;
       }
       if (bodyDataB instanceof Wall) {
         if (bodyDataA.isGrappling) {
@@ -151,16 +151,16 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         }
       }
       else if (bodyDataB instanceof Hazard) {
-	bodyDataA.isDead = true;
+        bodyDataA.isDead = true;
       }
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects++;
         if (bodyDataB.numPressingObjects == 1) {
-	  bodyDataB.linkedObject.buttonStart();
+          bodyDataB.linkedObject.buttonStart();
         }
       }
       else if (bodyDataB instanceof Transition) {
-	bodyDataB.isTouched = true;
+        bodyDataB.isTouched = true;
       }
       else if (bodyDataB instanceof Collectable) {
         if (!bodyDataB.isCollected) {
@@ -186,7 +186,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
         bodyDataA.hitObject = bodyDataB;
       }
       else if (bodyDataB instanceof Door) {
-	bodyDataA.isDone = true;
+        bodyDataA.isDone = true;
       }
       else if (bodyDataB instanceof Hazard) {
         bodyDataA.isDone = true;
@@ -207,23 +207,23 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     if (bodyDataA instanceof Ground) {
       if (bodyDataB instanceof Player) {
-	bodyDataB.isGrounded = false;
+        bodyDataB.isGrounded = false;
       }
       else if (bodyDataB instanceof Box) {
-	bodyDataB.isGrounded = false;
+        bodyDataB.isGrounded = false;
       }
     }
     else if (bodyDataA instanceof Box) {
       if (bodyDataB instanceof Ground) {
-	bodyDataA.isGrounded = false;
+        bodyDataA.isGrounded = false;
       }
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects--;
         if (bodyDataB.numPressingObjects == 0) {
-	  bodyDataB.linkedObject.buttonEnd();
+          bodyDataB.linkedObject.buttonEnd();
         }
       }
-    }    
+    }
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Ground) {
         bodyDataA.isGrounded = false;
@@ -231,14 +231,14 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects--;
         if (bodyDataB.numPressingObjects == 0) {
-	  bodyDataB.linkedObject.buttonEnd();
+          bodyDataB.linkedObject.buttonEnd();
         }
       }
     }
     else if (bodyDataA instanceof Button) {
       bodyDataA.numPressingObjects--;
       if (bodyDataA.numPressingObjects == 0) {
-	bodyDataA.linkedObject.buttonEnd();
+        bodyDataA.linkedObject.buttonEnd();
       }
     }
   }
@@ -382,7 +382,7 @@ class Transition {
   activate() {
     for (let body of bodys) {
       if (body) {
-       world.DestroyBody(body);
+        world.DestroyBody(body);
       }
     }
     createLevel(this.levelIndex);
@@ -522,27 +522,27 @@ class Player {
       if (input.m1) {
         if (this.isGrappling) {
           if (this.grapple.hitObject) {
-	    let grappleBody = this.grapple.body;
-	    let hitBody = this.grapple.hitObject.body;
+            let grappleBody = this.grapple.body;
+            let hitBody = this.grapple.hitObject.body;
             grappleBody.SetActive(false);
             let playerCenter = this.body.GetWorldCenter();
             let grappleCenter = grappleBody.GetWorldCenter();
-	    let hitCenter = hitBody.GetWorldCenter();
-	    if (hitBody.GetType() == box2d.b2Body.b2_dynamicBody) {
+            let hitCenter = hitBody.GetWorldCenter();
+            if (hitBody.GetType() == box2d.b2Body.b2_dynamicBody) {
               let grappleAngle = Math.atan2(hitCenter.y - playerCenter.y, hitCenter.x - playerCenter.x);
               let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
               grappleImp.Multiply(2);
               this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
-	      grappleImp.Multiply(-1);
-	      hitBody.ApplyImpulse(grappleImp, hitBody.GetWorldCenter());
-	      this.grapple.body.SetPosition(hitCenter);
-	    }
-	    else {
+              grappleImp.Multiply(-1);
+              hitBody.ApplyImpulse(grappleImp, hitBody.GetWorldCenter());
+              this.grapple.body.SetPosition(hitCenter);
+            }
+            else {
               let grappleAngle = Math.atan2(grappleCenter.y - playerCenter.y, grappleCenter.x - playerCenter.x);
               let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
               grappleImp.Multiply(2);
               this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
-	    }
+            }
           }
         }
         else if (this.canGrapple) {
@@ -556,7 +556,7 @@ class Player {
         this.canGrapple = true;
       }
     }
-	
+
     if (this.isGrappling && this.grapple && this.grapple.hitObject && !this.grapple.hitObject.body.IsActive()) {
       this.endGrapple();
     }
@@ -567,7 +567,7 @@ class Player {
       this.grapple = null;
     }
 
-    if (!this.isGrappling || !this.grapple || ! this.grapple.hitObject) {
+    if (!this.isGrappling || !this.grapple || !this.grapple.hitObject) {
       if (this.body.m_linearVelocity.Length() > this.maxSpeed) {
         this.body.m_linearVelocity.Multiply(this.maxSpeed / this.body.m_linearVelocity.Length());
       }
@@ -605,8 +605,8 @@ function init() {
   stage = new createjs.Stage(document.getElementById("game-canvas"));
   setupPhysics();
   setupInput();
-  createLevel(0);
   overlay.init(stage);
+  createLevel(0);
 
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.framerate = 60;
@@ -653,7 +653,7 @@ function tick() {
   for (let box of boxes) {
     box.tick();
   }
-  if(createjs.Ticker.getMeasuredFPS() < 50){
+  if (createjs.Ticker.getMeasuredFPS() < 50) {
     //console.log(createjs.Ticker.getMeasuredFPS())
   }
   overlay.tick(player);
@@ -707,9 +707,10 @@ function setupInput() {
 }
 
 function createLevel(l) {
-  switch(l) {
+  switch (l) {
     case 0:
       player = new Player(240 / SCALE, 960 / SCALE);
+      new Ground(960 / SCALE, 512 / SCALE, 32 / SCALE, 32 / SCALE);
       new Ground(960 / SCALE, 960 / SCALE, 960 / SCALE, 160 / SCALE);
       new Ground(1736 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);
       new Ground(180 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);

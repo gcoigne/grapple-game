@@ -10,7 +10,7 @@ let lastlocx = 0    //in pixels
 let lastlocy = 0    //in pixels
 let chunkSize = 5   // needs to be a prime number
 let tile
-let scale = 3.2
+let scale = 2
 let offsetx, offsety
 let mapContainerfront = new createjs.Container()
 let mapContainerback = new createjs.Container()
@@ -31,18 +31,14 @@ export function init(mainLoopStage) {
     stage = mainLoopStage
     let manifest = [
         { src: "floor_tile.png", id: "0" },
-        { src: "wall_parts/test_wall/1.png", id: "1" },
-        { src: "wall_parts/test_wall/2.png", id: "2" },
-        { src: "wall_parts/test_wall/3.png", id: "3" },
-        { src: "wall_parts/test_wall/4.png", id: "4" },
-        { src: "wall_parts/test_wall/5.png", id: "5" },
-        { src: "wall_parts/test_wall/6.png", id: "6" },
-        { src: "wall_parts/test_wall/7.png", id: "7" },
-        { src: "wall_parts/test_wall/8.png", id: "8" },
-        { src: "wall_parts/test_wall/9.png", id: "9" },
-        { src: "wall_parts/test_wall/10.png", id: "10" },
-        { src: "wall_parts/test_wall/11.png", id: "11" },
-        { src: "wall_parts/test_wall/12.png", id: "12" },
+        { src: "topdown_wall_pats/top.png", id: "1" },
+        { src: "topdown_wall_pats/bottom.png", id: "2" },
+        { src: "topdown_wall_pats/left.png", id: "3" },
+        { src: "topdown_wall_pats/right.png", id: "4" },
+        { src: "topdown_wall_pats/top_left.png", id: "5" },
+        { src: "topdown_wall_pats/top_right.png", id: "6" },
+        { src: "topdown_wall_pats/bottom_left.png", id: "7" },
+        { src: "topdown_wall_pats/bottom_right.png", id: "8" },
     ]
 
     loader = new createjs.LoadQueue(false)
@@ -53,23 +49,11 @@ export function init(mainLoopStage) {
 
 function handleComplete() {
     player = new createjs.Shape()
-    player.graphics.beginFill("red").drawCircle(canvas_width / 2 / scale, canvas_height / 2 / scale, 8)
+    player.graphics.beginFill("red").drawCircle(canvas_width / 2 / scale, canvas_height / 2 / scale, 15)
     player.scale = scale
     //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
-    player.cache(canvas_width / 2 / scale - 8, canvas_height / 2 / scale - 8, 8 * 2, 8 * 2, 4)
-    for (let i = -2; i <= 2; i++) {
-        for (let j = -2; j <= 2; j++) {
-            map[locy + i][locx + j] = 0
-            tile = new createjs.Shape()
-            tile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, 32, 32)
-            tile.scale = scale
-            //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
-            tile.cache(0, 0, 32, 32)
-            tile.x = (i * 32) * scale + offsetx
-            tile.y = (j * 32) * scale + offsety
-            mapContainerback.addChild(tile)
-        }
-    }
+    player.cache(canvas_width / 2 / scale - 15, canvas_height / 2 / scale - 15, 15 * 2, 15 * 2, 4)
+    generatelevel1()
     grapple = new createjs.Shape()
     grapple.scale = scale
     mapContainerorigin.scale = scale
@@ -77,24 +61,31 @@ function handleComplete() {
     startTick()
 }
 
-export function overlayGround(x, y) {
+function generatelevel1() {
+    overlayGround(960, 512, 32, 32)
+    overlayGround(960, 960, 960, 160)
+    overlayGround(1736, 192, 160, 160)
+    overlayGround(180, 192, 160, 160)
+}
+
+export function overlayGround(x, y, l, w) {
     let newTile = new createjs.Shape()
-    tile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, 32, 32)
-    tile.scale = scale
-    tile.cache(0, 0, 32, 32)
-    tile.x = (x * 32) * scale + offsetx
-    tile.y = (y * 32) * scale + offsety
+    newTile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
+    newTile.scale = scale
+    newTile.cache(0, 0, l, w)
+    newTile.x = Math.floor(x / 32) * 32 - l
+    newTile.y = Math.floor(y / 32) * 32 - w
     mapContainerfloor.addChild(newTile)
 }
 
 export function overlayBack(x, y, l, w, type) {
     let newBackWall = new createjs.Shape()
-    tile.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
-    tile.scale = scale
-    tile.cache(0, 0, 32, 32)
-    tile.x = (x * 32) * scale + offsetx
-    tile.y = (y * 32) * scale + offsety
-    mapContainerfloor.addChild(newTile)
+    newBackWall.graphics.beginBitmapFill(loader.getResult("0"), "repeat").drawRect(0, 0, l, w)
+    newBackWall.scale = scale
+    newBackWall.cache(0, 0, 32, 32)
+    newBackWall.x = (x * 32) * scale + offsetx
+    newBackWall.y = (y * 32) * scale + offsety
+    mapContainerfloor.addChild(newBackWall)
 }
 
 export function overlayFront(x, y) {
@@ -117,7 +108,7 @@ function drawGrapple(box2DGrapple) {
 }
 
 export function tick(box2DPlayer) {
-    //stage.update()
+    stage.update()
     let vec = box2DPlayer.body.GetPosition()
     player.x = vec.x * 30 - canvas_width / 2
     player.y = vec.y * 30 - canvas_height / 2
