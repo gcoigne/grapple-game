@@ -44,7 +44,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     if (bodyDataA instanceof Ground) {
       if (bodyDataB instanceof Player) {
-        bodyDataB.isGrounded = true;
+        bodyDataB.numGroundTouching++;
       }
       else if (bodyDataB instanceof Box) {
         bodyDataB.isGrounded = true;
@@ -134,7 +134,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Ground) {
-        bodyDataA.isGrounded = true;
+        bodyDataA.numGroundTouching++;
       }
       if (bodyDataB instanceof Wall) {
         if (bodyDataA.isGrappling) {
@@ -207,7 +207,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
 
     if (bodyDataA instanceof Ground) {
       if (bodyDataB instanceof Player) {
-        bodyDataB.isGrounded = false;
+        bodyDataB.numGroundTouching--;
       }
       else if (bodyDataB instanceof Box) {
         bodyDataB.isGrounded = false;
@@ -226,7 +226,7 @@ class MyContactListener extends Box2D.Dynamics.b2ContactListener {
     }
     else if (bodyDataA instanceof Player) {
       if (bodyDataB instanceof Ground) {
-        bodyDataA.isGrounded = false;
+        bodyDataA.numGroundTouching--;
       }
       else if (bodyDataB instanceof Button) {
         bodyDataB.numPressingObjects--;
@@ -459,7 +459,7 @@ class Player {
     fixDef.density = 1;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.25;
-    fixDef.shape = new box2d.b2CircleShape(30 / SCALE);
+    fixDef.shape = new box2d.b2CircleShape(32 / SCALE);
     fixDef.filter.categoryBits = categorys.PLAYER;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
@@ -469,7 +469,7 @@ class Player {
     this.isGrappling = false;
     this.canGrapple = true;
     this.isDead = false;
-    this.isGrounded = true;
+    this.numGroundTouching = 1;
     this.grapple = null;
     this.inventory = {};
     bodys.push(this.body);
@@ -493,7 +493,7 @@ class Player {
   }
 
   tick() {
-    if (!this.isDead && !this.isGrounded && !(this.isGrappling && this.grapple.hitObject)) {
+    if (!this.isDead && this.numGroundTouching == 0 && !(this.isGrappling && this.grapple.hitObject)) {
       this.isDead = true;
     }
     if (this.isDead) {
@@ -735,7 +735,7 @@ function loadLevel(l) {
       new Wall(960 / SCALE, 1056 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
       new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
+      //new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
       new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
       new Wall(1472 / SCALE, 320 / SCALE, 64 / SCALE, 192 / SCALE);
       doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
