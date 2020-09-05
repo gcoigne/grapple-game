@@ -1139,9 +1139,6 @@ function handleKeyDown(e) {
         var e = window.event
     }
     switch (e.keyCode) {
-        case KEYCODE_SPACE:
-            shootHeld = true
-            break
         case KEYCODE_A:
         case KEYCODE_LEFT:
             lfHeld = true
@@ -1167,9 +1164,6 @@ function handleKeyUp(e) {
         var e = window.event
     }
     switch (e.keyCode) {
-        case KEYCODE_SPACE:
-            shootHeld = false
-            break
         case KEYCODE_A:
         case KEYCODE_LEFT:
             lfHeld = false

@@ -459,7 +459,7 @@ class Player {
     fixDef.density = 1;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.25;
-    fixDef.shape = new box2d.b2CircleShape(32 / SCALE);
+    fixDef.shape = new box2d.b2CircleShape(30 / SCALE);
     fixDef.filter.categoryBits = categorys.PLAYER;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
@@ -592,7 +592,7 @@ class Grapple {
 }
 
 let stage, world, contactListener;
-let bodys, player, doors, transitions, collectables, boxes;
+let bodys, player, doors, transitions, collectables, boxes, buttons;
 let SCALE = 30;
 let levelIndex = 0;
 
@@ -652,7 +652,7 @@ function tick() {
   if (createjs.Ticker.getMeasuredFPS() < 50) {
     //console.log(createjs.Ticker.getMeasuredFPS())
   }
-  overlay.tick(player, boxes);
+  overlay.tick(player, boxes, doors, buttons);
 }
 
 function setupInput() {
@@ -660,15 +660,19 @@ function setupInput() {
     switch (evt.key) {
       case 'a':
         input.left = true;
+        overlay.rotatePlayer(-90)
         break;
       case 'd':
         input.right = true;
+        overlay.rotatePlayer(90)
         break;
       case 's':
         input.down = true;
+        overlay.rotatePlayer(180)
         break;
       case 'w':
         input.up = true;
+        overlay.rotatePlayer(0)
         break;
     }
   }
@@ -726,22 +730,19 @@ function loadLevel(l) {
       break;
     case 1:
       player = new Player(256 / SCALE, 960 / SCALE);
-      /*
       new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
       new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
       new Ground(1440 / SCALE, 864 / SCALE, 480 / SCALE, 160 / SCALE);
-      */
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(960 / SCALE, 1056 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
       new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      //new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
-      new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
+      new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
+      new Wall(1728 / SCALE, 448 / SCALE, 256 / SCALE, 64 / SCALE);
       new Wall(1472 / SCALE, 320 / SCALE, 64 / SCALE, 192 / SCALE);
       doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
       boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
-      new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]);
-      new Button(1184 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[1]);
+      buttons = [new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]), new Button(1184 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[1])];
       collectables = [];
       transitions = [new Transition(1736 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 0)];
       overlay.generatelevel2()
