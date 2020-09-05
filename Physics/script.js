@@ -459,7 +459,7 @@ class Player {
     fixDef.density = 1;
     fixDef.friction = 0.5;
     fixDef.restitution = 0.25;
-    fixDef.shape = new box2d.b2CircleShape(32 / SCALE);
+    fixDef.shape = new box2d.b2CircleShape(30 / SCALE);
     fixDef.filter.categoryBits = categorys.PLAYER;
     this.body = world.CreateBody(bodyDef);
     this.fix = this.body.CreateFixture(fixDef);
@@ -726,9 +726,10 @@ function loadLevel(l) {
       break;
     case 1:
       player = new Player(256 / SCALE, 960 / SCALE);
-      //new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
-      //new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
-      //new Ground(1440 / SCALE, 864 / SCALE, 480 / SCALE, 160 / SCALE);
+      new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
+      new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
+      new Ground(1440 / SCALE, 864 / SCALE, 480 / SCALE, 160 / SCALE);
+      /*
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(960 / SCALE, 1056 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
@@ -736,6 +737,7 @@ function loadLevel(l) {
       new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
       new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
       new Wall(1472 / SCALE, 352 / SCALE, 64 / SCALE, 160 / SCALE);
+      */
       doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
       boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
       new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]);
