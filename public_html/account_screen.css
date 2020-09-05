@@ -1,0 +1,29 @@
+body {
+    background-color: darkgray;
+    text-align: center;
+  }
+
+h1{
+  font-size: 40px;
+  color:black;
+}
+
+label{
+  color:black;
+  font-size: 35px;
+}
+
+.center {
+    margin: 0;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+
+button{
+  background-color: black;
+  color: white;
+  font-size: 30px;
+}
