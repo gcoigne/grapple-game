@@ -380,12 +380,7 @@ class Transition {
   }
 
   activate() {
-    for (let body of bodys) {
-      if (body) {
-        world.DestroyBody(body);
-      }
-    }
-    createLevel(this.levelIndex);
+    loadLevel(this.levelIndex);
   }
 
   tick() {
@@ -502,11 +497,12 @@ class Player {
       this.isDead = true;
     }
     if (this.isDead) {
-      if (this.grapple) {
-        world.DestroyBody(this.grapple.body);
-        this.grapple = null;
-      }
-      this.body.SetActive(false);
+      loadLevel(levelIndex);
+      //if (this.grapple) {
+        //world.DestroyBody(this.grapple.body);
+        //this.grapple = null;
+      //}
+      //this.body.SetActive(false);
     }
     else {
       let xInput = (input.right ? 1 : 0) - (input.left ? 1 : 0);
@@ -531,7 +527,6 @@ class Player {
             if (hitBody.GetType() == box2d.b2Body.b2_dynamicBody) {
               let grappleAngle = Math.atan2(hitCenter.y - playerCenter.y, hitCenter.x - playerCenter.x);
               let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
-              grappleImp.Multiply(2);
               this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
               grappleImp.Multiply(-1);
               hitBody.ApplyImpulse(grappleImp, hitBody.GetWorldCenter());
@@ -540,7 +535,6 @@ class Player {
             else {
               let grappleAngle = Math.atan2(grappleCenter.y - playerCenter.y, grappleCenter.x - playerCenter.x);
               let grappleImp = new box2d.b2Vec2(this.moveImpulse * Math.cos(grappleAngle), this.moveImpulse * Math.sin(grappleAngle));
-              grappleImp.Multiply(2);
               this.body.ApplyImpulse(grappleImp, this.body.GetWorldCenter());
             }
           }
@@ -597,14 +591,17 @@ class Grapple {
   }
 }
 
+let stage, world, contactListener;
+let bodys, player, doors, transitions, collectables, boxes;
 let SCALE = 30;
-let stage, world, contactListener, bodys, player, doors, transitions, collectables, boxes;
+let levelIndex = 0;
 
 function init() {
   bodys = [];
   stage = new createjs.Stage(document.getElementById("game-canvas"));
   setupPhysics();
   setupInput();
+  loadLevel(0);
   overlay.init(stage);
   createLevel(0);
 
@@ -706,25 +703,48 @@ function setupInput() {
   });
 }
 
-function createLevel(l) {
-  switch (l) {
+function loadLevel(l) {
+  for (let body of bodys) {
+    if (body) {
+      world.DestroyBody(body);
+    }
+  }
+  switch(l) {
     case 0:
-      player = new Player(240 / SCALE, 960 / SCALE);
-      new Ground(960 / SCALE, 512 / SCALE, 32 / SCALE, 32 / SCALE);
+      player = new Player(256 / SCALE, 960 / SCALE);
       new Ground(960 / SCALE, 960 / SCALE, 960 / SCALE, 160 / SCALE);
       new Ground(1736 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);
       new Ground(180 / SCALE, 192 / SCALE, 160 / SCALE, 160 / SCALE);
       new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(960 / SCALE, 1048 / SCALE, 960 / SCALE, 32 / SCALE);
-      new Wall(32 / SCALE, 540 / SCALE, 32 / SCALE, 540 / SCALE);
-      new Wall(1888 / SCALE, 540 / SCALE, 32 / SCALE, 540 / SCALE);
-      new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 32 / SCALE);
+      new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 64 / SCALE);
       doors = [];
       boxes = [];
       collectables = [];
-      transitions = [new Transition(240 / SCALE, 192 / SCALE, 64 / SCALE, 64 / SCALE, 0)];
+      transitions = [new Transition(240 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 1)];
       break;
+    case 1:
+      player = new Player(256 / SCALE, 960 / SCALE);
+      new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
+      new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
+      new Ground(1440 / SCALE, 832 / SCALE, 480 / SCALE, 160 / SCALE);
+      new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(960 / SCALE, 584 / SCALE, 64 / SCALE, 384 / SCALE);
+      new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
+      new Wall(1504 / SCALE, 352 / SCALE, 64 / SCALE, 160 / SCALE);
+      doors = [new Door(960 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE), new Door(1472 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE)];
+      boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
+      new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]);
+      new Button(1184 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[1]);
+      collectables = [];
+      transitions = [new Transition(1736 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 0)];
   }
+  levelIndex = l;
 }
 
 init();
