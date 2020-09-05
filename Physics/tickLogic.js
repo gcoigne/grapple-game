@@ -70,7 +70,7 @@ function handleComplete() {
     })
 
     //By default swapping between Stage for StageGL will not allow for vector drawing operation such as BitmapFill, useless you cache your shape.
-    generatelevel1()
+    generatelevel2()
     grapple = new createjs.Shape()
     grapple.scale = scale
     mapContainerorigin.scale = scale
@@ -125,7 +125,9 @@ export function generatelevel2() {
     overlayWall(32, 1056, 32, 32, "7")
 
     overlayWall(960 - 32, 584, 32, 448, "4")
+    overlayWall(960 - 32, 1064, 32, 32, "8")
     overlayWall(960 + 32, 584, 32, 448, "3")
+    overlayWall(960 + 32, 1064, 32, 32, "7")
 
     overlayWall(1472 - 32, 320, 32, 192, "4")
     overlayWall(1472 + 32, 320, 32, 192, "3")
