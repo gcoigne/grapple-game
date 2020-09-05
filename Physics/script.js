@@ -718,7 +718,7 @@ function loadLevel(l) {
       new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
       new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 32 / SCALE);
+      new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 64 / SCALE);
       doors = [];
       boxes = [];
       collectables = [];
@@ -726,18 +726,16 @@ function loadLevel(l) {
       break;
     case 1:
       player = new Player(256 / SCALE, 960 / SCALE);
-      //new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
-      //new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
-      //new Ground(1440 / SCALE, 832 / SCALE, 480 / SCALE, 160 / SCALE);
-      new Wall(480 / SCALE, 32 / SCALE, 480 / SCALE, 32 / SCALE);
+      new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
+      new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
+      new Ground(1440 / SCALE, 832 / SCALE, 480 / SCALE, 160 / SCALE);
+      new Wall(960 / SCALE, 32 / SCALE, 960 / SCALE, 32 / SCALE);
+      new Wall(960 / SCALE, 1008 / SCALE, 960 / SCALE, 32 / SCALE);
       new Wall(32 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Wall(480 / SCALE, 1008 / SCALE, 480 / SCALE, 32 / SCALE);
-      new Hazard(1440 / SCALE, 32 / SCALE, 480 / SCALE, 32 / SCALE);
-      new Hazard(1440 / SCALE, 1008 / SCALE, 480 / SCALE, 32 / SCALE);
-      new Hazard(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
-      new Hazard(960 / SCALE, 604 / SCALE, 32 / SCALE, 384 / SCALE);
-      new Hazard(1728 / SCALE, 480 / SCALE, 240 / SCALE, 32 / SCALE);
-      new Hazard(1472 / SCALE, 352 / SCALE, 32 / SCALE, 160 / SCALE);
+      new Wall(1888 / SCALE, 512 / SCALE, 32 / SCALE, 512 / SCALE);
+      new Wall(960 / SCALE, 584 / SCALE, 64 / SCALE, 384 / SCALE);
+      new Wall(1728 / SCALE, 448 / SCALE, 240 / SCALE, 64 / SCALE);
+      new Wall(1504 / SCALE, 352 / SCALE, 64 / SCALE, 160 / SCALE);
       doors = [new Door(960 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE), new Door(1472 / SCALE, 128 / SCALE, 32 / SCALE, 64 / SCALE)];
       boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
       new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]);
