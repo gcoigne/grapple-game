@@ -413,7 +413,7 @@ class Box {
     bodys.push(this.body);
   }
   tick() {
-    if (this.numGroundTouching == 0 && (!player.grapple || player.grapple.hitObject != this)) {
+    if (!this.isDead && this.numGroundTouching == 0 && (!player.grapple || player.grapple.hitObject != this)) {
       this.isDead = true;
     }
     if (this.isDead) {
@@ -469,7 +469,7 @@ class Player {
     this.isGrappling = false;
     this.canGrapple = true;
     this.isDead = false;
-    this.numGroundTouching = 1;
+    this.numGroundTouching = 0;
     this.grapple = null;
     this.inventory = {};
     bodys.push(this.body);
@@ -622,7 +622,7 @@ function setupPhysics() {
   debugDraw.SetSprite(stage.canvas.getContext("2d"));
   debugDraw.SetDrawScale(SCALE);
   debugDraw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
-  world.SetDebugDraw(debugDraw);
+  //world.SetDebugDraw(debugDraw);
 }
 
 function tick() {
@@ -714,7 +714,6 @@ function loadLevel(l) {
   }
   switch(l) {
     case 0:
-      player = new Player(256 / SCALE, 960 / SCALE);
       new Ground(960 / SCALE, 928 / SCALE, 960 / SCALE, 160 / SCALE);
       new Ground(1760 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
       new Ground(160 / SCALE, 160 / SCALE, 160 / SCALE, 160 / SCALE);
@@ -723,13 +722,13 @@ function loadLevel(l) {
       new Wall(32 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
       new Wall(1888 / SCALE, 544 / SCALE, 32 / SCALE, 544 / SCALE);
       new Wall(480 / SCALE, 384 / SCALE, 480 / SCALE, 64 / SCALE);
-      doors = [];
+      player = new Player(256 / SCALE, 960 / SCALE);
       boxes = [];
+      doors = [];
       collectables = [];
       transitions = [new Transition(240 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 1)];
       break;
     case 1:
-      player = new Player(256 / SCALE, 960 / SCALE);
       new Ground(480 / SCALE, 512 / SCALE, 480 / SCALE, 512 / SCALE);
       new Ground(1440 / SCALE, 256 / SCALE, 480 / SCALE, 256 / SCALE);
       new Ground(1440 / SCALE, 864 / SCALE, 480 / SCALE, 160 / SCALE);
@@ -740,12 +739,14 @@ function loadLevel(l) {
       new Wall(960 / SCALE, 576 / SCALE, 64 / SCALE, 448 / SCALE);
       new Wall(1728 / SCALE, 448 / SCALE, 256 / SCALE, 64 / SCALE);
       new Wall(1472 / SCALE, 320 / SCALE, 64 / SCALE, 192 / SCALE);
-      doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
+      player = new Player(256 / SCALE, 960 / SCALE);
       boxes = [new Box(480 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE), new Box(1440 / SCALE, 768 / SCALE, 32 / SCALE, 32 / SCALE)];
+      doors = [new Door(928 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE), new Door(1440 / SCALE, 96 / SCALE, 32 / SCALE, 32 / SCALE)];
       buttons = [new Button(480 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[0]), new Button(1184 / SCALE, 256 / SCALE, 32 / SCALE, 32 / SCALE, doors[1])];
       collectables = [];
-      transitions = [new Transition(1736 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 0)];
-      overlay.generatelevel2()
+      transitions = [new Transition(1736 / SCALE, 192 / SCALE, 32 / SCALE, 32 / SCALE, 1)];
+      overlay.generatelevel2();
+      break;
   }
   levelIndex = l;
 }
