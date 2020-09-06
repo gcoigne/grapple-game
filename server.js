@@ -31,24 +31,29 @@ app.get("/", function (req, res) {
 });
 
 app.post("/login", function (req, res) {
-    db = new sqlite3.Database('./finalProject.db', (err) => {
-        if (err) {
-            console.log(err.message);
-        }
-        console.log('Connected to finalProject db in sqlite');
-    });
-    let user = req.body.user;
-    let pwd = req.body.pwd;
-    console.log(user, pwd)
-    let sql = `SELECT user_id,
+  let user = req.query.user;
+  let pwd = req.query.pwd;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
+  let sql = `SELECT user_id,
                     name,
                     password
             FROM users
             WHERE name = ?`;
     let status = 200
 
-    // first row only
-    db.get(sql, [user], (err, row) => {
+
+  // first row only
+  db.get(sql, [user], (err, res) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    else {
+      bcrypt.compare(password, hash, (err, eq) => {
         if (err) {
             return console.error(err.message);
         }
@@ -69,24 +74,23 @@ app.post("/login", function (req, res) {
 });
 
 app.post("/add", function (req, res) {
-    db = new sqlite3.Database('./finalProject.db', (err) => {
-        if (err) {
-            console.log(err.message);
-        }
-        console.log('Connected to finalProject db in sqlite');
-    });
-    let username = req.body.username;
-    let pwd = req.body.plaintextPassword;
-
-    bcrypt.hash(password, rounds, (err, hash) => {
-        if (err) {
-            console.error(err);
-        }
-        db.run('INSERT INTO users(name, password) VALUES(?,?)', [username, hash], function (err) {
-            if (err) {
-                return console.log(err.message);
-            }
-        });
+  let username = req.body.username;
+  let pwd = req.body.plaintextPassword;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
+  
+  bcrypt.hash(pwd, 8, (err, hash) => {
+    if (err) {
+      console.error(err);
+    }
+    db.run('INSERT INTO users(name, pwd) VALUES(?,?)', [username, hash], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
     });
 
     db.close();
@@ -94,20 +98,21 @@ app.post("/add", function (req, res) {
 });
 
 app.post("/delete", function (req, res) {
-    db = new sqlite3.Database('./finalProject.db', (err) => {
-        if (err) {
-            console.log(err.message);
-        }
-        console.log('Connected to finalProject db in sqlite');
-    });
-    let deletion = req.body.delete;
-    db.run(`DELETE FROM users WHERE name=?`, deletion, function (err) {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log(`Row(s) deleted ${this.changes}`);
-    });
-    db.close();
+  let deletion = req.body.delete;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
+
+  db.run(`DELETE FROM users WHERE name=?`, deletion, function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log(`Row(s) deleted ${this.changes}`);
+  });
+  db.close();
 });
 
 app.post("/edit", function (req, res) {
@@ -120,6 +125,12 @@ app.post("/edit", function (req, res) {
     let sql = `UPDATE users
           SET name = ?
           WHERE name = ?`;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
 
     db.run(sql, [toEdit, user], function (err) {
         if (err) {
