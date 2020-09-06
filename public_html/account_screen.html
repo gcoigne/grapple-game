@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="account_screen.css">
 </head>
 <body>
-<h1>You're About to Have Some Fun</h1>   
+<h1>You're About to Have Some Fun</h1>
 <div class="center">
-        <div> 
+        <div>
             <label name="username" for="username">Username:</label>
             <input type="text" id="username">
         </div>
@@ -20,12 +20,12 @@
         <p></p>
     <button id="log-sign">Log-in</button>
     <button id="create">Create account</button>
-    
+
 </div>
     <script>
         let usernameInput = document.getElementById("username");
         let passwordInput = document.getElementById("password");
- 
+
         document.getElementById("create").addEventListener("click", function () {
             fetch("/add", {
                 method: "POST",
@@ -56,15 +56,15 @@
 	if (response.status === 200) {
 		response.json().then(function(data) {
             console.log("Log in successful")
-		    console.log(data); 	
+		    console.log(data);
 		})
 	} else {
 		response.json().then(function(data) {
-		console.log("log in unsuccessful. User does not exist. Please create an account"); 	
+		console.log("log in unsuccessful. User does not exist. Please create an account");
 		});
 	};
 	});
 });
-        </script>   
+        </script>
 </body>
 </html>
