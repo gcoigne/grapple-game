@@ -43,17 +43,24 @@ app.get("/get", function (req, res) {
                     password
             FROM users
             WHERE name = ?`;
+    let status = 200
 
     // first row only
     db.get(sql, [user], (err, row) => {
         if (err) {
             return console.error(err.message);
         }
+        if(row === undefined){
+            console.log("Password does not match the user that was entered.");
+            res.status(500).json()
+        }
         else if (row.password === pwd) {
             console.log("Passwords match!");
+            res.status(200).json()
         }
         else {
             console.log("Password does not match the user that was entered.");
+            res.status(500).json()
         }
 
         //? console.log(row.user_id, row.name)
@@ -83,10 +90,10 @@ app.post("/add", function (req, res) {
         }
         // get the last insert id
         console.log(`A row has been inserted with rowid ${this.lastID}`);
+        res.status(200).send();
     });
 
     db.close();
-    res.status(200);
 });
 
 app.post("/delete", function (req, res) {
