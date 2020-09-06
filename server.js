@@ -30,15 +30,15 @@ db.close();
 app.get("/", function (req, res) {
 });
 
-app.get("/login", function (req, res) {
+app.post("/login", function (req, res) {
     db = new sqlite3.Database('./finalProject.db', (err) => {
         if (err) {
             console.log(err.message);
         }
         console.log('Connected to finalProject db in sqlite');
     });
-    let user = req.query.user;
-    let pwd = req.query.pwd;
+    let user = req.body.user;
+    let pwd = req.body.pwd;
     let sql = `SELECT user_id,
                     name,
                     password
@@ -47,27 +47,19 @@ app.get("/login", function (req, res) {
     let status = 200
 
     // first row only
-    db.get(sql, [user], (err, res) => {
+    db.get(sql, [user], (err, row) => {
         if (err) {
             return console.error(err.message);
         }
         else {
-            bcrypt.compare(password, hash, (err, eq) => {
+            bcrypt.compare(pwd, row.password, (err, eq) => {
                 if (err) {
+                    console.log("Password does not match the user that was entered.");
+                    res.status(500).json()
                     return console.error(err.message);
                 }
-                if (row === undefined) {
-                    console.log("Password does not match the user that was entered.");
-                    res.status(500).json()
-                }
-                else if (row.password === pwd) {
-                    console.log("Passwords match!");
-                    res.status(200).json()
-                }
-                else {
-                    console.log("Password does not match the user that was entered.");
-                    res.status(500).json()
-                }
+                console.log("Passwords match!");
+                res.status(200).json()
             });
         }
     });
@@ -84,7 +76,7 @@ app.post("/add", function (req, res) {
     let username = req.body.username;
     let pwd = req.body.plaintextPassword;
 
-    bcrypt.hash(password, rounds, (err, hash) => {
+    bcrypt.hash(pwd, 8, (err, hash) => {
         if (err) {
             console.error(err);
         }

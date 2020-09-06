@@ -57,8 +57,16 @@
         });
 
         document.getElementById("log-sign").addEventListener("click", function () {
-            let url = `/get?user=${usernameInput.value}&pwd=${passwordInput.value}`;
-            fetch(url).then(function (response) {
+            fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: usernameInput.value,
+                    pwd: passwordInput.value,
+                })
+            }).then(function (response) {
                 console.log(response.status)
                 if (response.status === 200) {
                     console.log("Log in successful")
