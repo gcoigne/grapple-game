@@ -30,14 +30,21 @@ db.close();
 app.get("/", function (req, res) {
 });
 
-app.get("/login", function (req, res) {
+app.post("/login", function (req, res) {
   let user = req.query.user;
   let pwd = req.query.pwd;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
   let sql = `SELECT user_id,
                     name,
                     password
             FROM users
             WHERE name = ?`;
+
 
   // first row only
   db.get(sql, [user], (err, res) => {
@@ -61,12 +68,18 @@ app.get("/login", function (req, res) {
 app.post("/add", function (req, res) {
   let username = req.body.username;
   let pwd = req.body.plaintextPassword;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
   
-  bcrypt.hash(password, rounds, (err, hash) => {
+  bcrypt.hash(pwd, 8, (err, hash) => {
     if (err) {
       console.error(err);
     }
-    db.run('INSERT INTO users(name, password) VALUES(?,?)', [username, hash], function(err) {
+    db.run('INSERT INTO users(name, pwd) VALUES(?,?)', [username, hash], function(err) {
       if (err) {
         return console.log(err.message);
       }
@@ -79,6 +92,13 @@ app.post("/add", function (req, res) {
 
 app.post("/delete", function (req, res) {
   let deletion = req.body.delete;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
+
   db.run(`DELETE FROM users WHERE name=?`, deletion, function(err) {
     if (err) {
       return console.error(err.message);
@@ -92,6 +112,12 @@ app.post("/edit", function (req, res) {
   let sql = `UPDATE users
           SET name = ?
           WHERE name = ?`;
+  let db = new sqlite3.Database('./finalProject.db', (err) => {
+    if (err) {
+      console.log(err.message);
+    }
+    console.log('Connected to finalProject db in sqlite');
+  });
 
   db.run(sql, [toEdit, user], function(err) {
     if (err) {
