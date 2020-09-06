@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Screen</title>
     <link rel="stylesheet" href="account_screen.css">
 </head>
+
 <body>
-<h1>You're About to Have Some Fun</h1>
-<div class="center">
+    <h1>You're About to Have Some Fun</h1>
+    <div class="center">
         <div>
             <label name="username" for="username">Username:</label>
             <input type="text" id="username">
@@ -18,10 +20,10 @@
             <input type="password" id="password">
         </div>
         <p></p>
-    <button id="log-sign">Log-in</button>
-    <button id="create">Create account</button>
+        <button id="log-sign">Log-in</button>
+        <button id="create">Create account</button>
 
-</div>
+    </div>
     <script>
         let usernameInput = document.getElementById("username");
         let passwordInput = document.getElementById("password");
@@ -37,34 +39,35 @@
                     plaintextPassword: passwordInput.value,
                 })
             }).then(function (response) {
-		        if (response.status === 200){
+                if (response.status === 200) {
                     console.log("success");
                 } else {
                     console.log("Failure");
                 }
                 return response
-	        }).then(function (data) {
+            }).then(function (data) {
                 console.log("this is the data: ", data);
-        }).catch(function(error){
-            console.log(error);
+            }).catch(function (error) {
+                console.log(error);
+            });
         });
-    });
 
-    document.getElementById("log-sign").addEventListener("click", function() {
-	let url = `/get?user=${usernameInput.value}&pwd=${passwordInput.value}`;
-	fetch(url).then(function (response) {
-	if (response.status === 200) {
-		response.json().then(function(data) {
-            console.log("Log in successful")
-		    console.log(data);
-		})
-	} else {
-		response.json().then(function(data) {
-		console.log("log in unsuccessful. User does not exist. Please create an account");
-		});
-	};
-	});
-});
-        </script>
+        document.getElementById("log-sign").addEventListener("click", function () {
+            let url = `/get?user=${usernameInput.value}&pwd=${passwordInput.value}`;
+            fetch(url).then(function (response) {
+                if (response.status === 200) {
+                    response.json().then(function (data) {
+                        console.log("Log in successful")
+                        console.log(data);
+                    })
+                } else {
+                    response.json().then(function (data) {
+                        console.log("log in unsuccessful. User does not exist. Please create an account");
+                    });
+                };
+            });
+        });
+    </script>
 </body>
+
 </html>
