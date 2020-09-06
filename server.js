@@ -44,6 +44,7 @@ app.post("/login", function (req, res) {
                     password
             FROM users
             WHERE name = ?`;
+    let status = 200
 
 
   // first row only
@@ -54,10 +55,19 @@ app.post("/login", function (req, res) {
     else {
       bcrypt.compare(password, hash, (err, eq) => {
         if (err) {
-          console.error(err);
+            return console.error(err.message);
+        }
+        if(row === undefined){
+            console.log("Password does not match the user that was entered.");
+            res.status(500).json()
+        }
+        else if (row.password === pwd) {
+            console.log("Passwords match!");
+            res.status(200).json()
         }
         else {
-          return res.json({success: eq});
+            console.log("Password does not match the user that was entered.");
+            res.status(500).json()
         }
       });
     }
@@ -87,7 +97,7 @@ app.post("/add", function (req, res) {
   });
 
   db.close();
-  res.status(200);
+  res.status(200).send();
 });
 
 app.post("/delete", function (req, res) {
