@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const sqlite3 = require("sqlite3").verbose();
-
+const bcrypt = require("bcrypt");
 
 const port = 3000;
 const hostname = "localhost";
@@ -30,80 +30,47 @@ db.close();
 app.get("/", function (req, res) {
 });
 
-app.get("/get", function (req, res) {
+app.get("/login", function (req, res) {
   let user = req.query.user;
   let pwd = req.query.pwd;
-  let db = new sqlite3.Database('./finalProject.db', (err) => {
-  if (err) {
-    console.log(err.message);
-  }
-  });
   let sql = `SELECT user_id,
                     name,
                     password
             FROM users
             WHERE name = ?`;
 
-// first row only
-db.get(sql, [user], (err, row) => {
-  if (err) {
-    return console.error(err.message);
-  }
-  else if(row.password === pwd){
-    console.log("Passwords match!");
+  // first row only
+  db.get(sql, [user], (err, res) => {
+    if (err) {
+      return console.error(err.message);
     }
-  else{
-    console.log("Password does not match the user that was entered.");
+    else {
+      bcrypt.compare(password, hash, (err, eq) => {
+        if (err) {
+          console.error(err);
+        }
+        else {
+          return res.json({success: eq});
+        }
+      });
     }
-
-  //? console.log(row.user_id, row.name)
-  //: console.log(`No playlist found with the id ${user}`);
-
-});
-
-  db.close();
-/*
-let db2 = new sqlite3.Database('./finalProject.db', (err) => {
-  if (err) {
-    console.log(err.message);
-  }
   });
-
-let sql2 = `SELECT * FROM users`;
-
-db2.all(sql2, [], (err, rows) => {
-if (err) {
-  throw err;
-}
-rows.forEach((row) => {
-console.log(row);
-});
-});
-
-// close the database connection
-db2.close();
-*/
+  db.close();
 });
 
 app.post("/add", function (req, res) {
   let username = req.body.username;
   let pwd = req.body.plaintextPassword;
-
-  //console.log("user: ", username);
-  //console.log("plaintext password:",pwd);
-
-  let db = new sqlite3.Database('./finalProject.db', (err) => {
+  
+  bcrypt.hash(password, rounds, (err, hash) => {
     if (err) {
-      console.log(err.message);
+      console.error(err);
     }
-  });
-
-  db.run('INSERT INTO users(name, password) VALUES(?,?)', [username, pwd], function(err) {
-    if (err) {
-      return console.log(err.message);
-    }
-    // get the last insert id
-    console.log(`A row has been inserted with rowid ${this.lastID}`);
+    db.run('INSERT INTO users(name, password) VALUES(?,?)', [username, hash], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+    });
   });
 
   db.close();
@@ -112,14 +79,6 @@ app.post("/add", function (req, res) {
 
 app.post("/delete", function (req, res) {
   let deletion = req.body.delete;
-
-  let db = new sqlite3.Database('./finalProject.db', (err) => {
-    if (err) {
-      console.log(err.message);
-    }
-  });
-
-// delete a row based on name
   db.run(`DELETE FROM users WHERE name=?`, deletion, function(err) {
     if (err) {
       return console.error(err.message);
@@ -127,17 +86,9 @@ app.post("/delete", function (req, res) {
     console.log(`Row(s) deleted ${this.changes}`);
   });
   db.close();
-  res.send("in the delete route");
 });
 
 app.post("/edit", function (req, res) {
-  let toEdit = req.body.edit;
-  let user = req.body.username;
-  let db = new sqlite3.Database('./finalProject.db', (err) => {
-    if (err) {
-      console.log(err.message);
-    }
-  });
   let sql = `UPDATE users
           SET name = ?
           WHERE name = ?`;
